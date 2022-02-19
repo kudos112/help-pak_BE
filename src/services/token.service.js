@@ -75,11 +75,11 @@ const generateAuthTokens = async (user) => {
 
   return {
     access: {
-      token: accessToken,
+      accessToken,
       expires: accessTokenExpires.toDate(),
     },
     refresh: {
-      token: refreshToken,
+      refreshToken,
       expires: refreshTokenExpires.toDate(),
     },
   };
