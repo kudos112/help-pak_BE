@@ -7,11 +7,13 @@ const register = {
     password: Joi.string().required().custom(password),
     name: Joi.string().required(),
     userType: Joi.string().required(),
+    images: Joi.array().required(),
   }),
 };
 
 const login = {
   body: Joi.object().keys({
+    userType: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.string().required(),
   }),

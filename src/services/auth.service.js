@@ -11,12 +11,18 @@ const { tokenTypes } = require('../config/tokens');
  * @param {string} password
  * @returns {Promise<User>}
  */
-const loginUserWithEmailAndPassword = async (email, password) => {
-  const user = await userService.getUserByEmail(email);
-  if (!user || !(await user.isPasswordMatch(password))) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+const loginUserWithEmailAndPassword = async (userType, email, password) => {
+  if (userType === 'INDIVIDUAL') {
+    const user = await userService.getUserWithEmailAndPassword(email, password);
+    if (!user) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+    }
+    return user;
   }
-  return user;
+  throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+
+  // else
+  // cons user = await ngoService.getUserByEmail( email );
 };
 
 /**

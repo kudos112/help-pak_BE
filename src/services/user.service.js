@@ -12,9 +12,9 @@ const createUser = async (userBody) => {
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  sendEmail(userBody.email, 'User successfully created', 'User Successfully Created');
-
-  return User.create(userBody);
+  const user = await User.create(userBody);
+  if (user) sendEmail(userBody.email, 'User successfully created', 'User Successfully Created');
+  return user;
 };
 
 /**
@@ -47,6 +47,12 @@ const getUserById = async (id) => {
  */
 const getUserByEmail = async (email) => {
   return User.findOne({ email });
+};
+
+const getUserWithEmailAndPassword = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (user) if (await user.isPasswordMatch(password)) return user;
+  return null;
 };
 
 /**
@@ -87,6 +93,7 @@ module.exports = {
   queryUsers,
   getUserById,
   getUserByEmail,
+  getUserWithEmailAndPassword,
   updateUserById,
   deleteUserById,
 };

@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
     userType: {
       type: String,
       required: true,
-      enum: ['IDIVIDUAL', 'NGO'],
+      enum: ['INDIVIDUAL', 'NGO'],
       trim: true,
     },
     name: {
@@ -40,6 +40,10 @@ const userSchema = mongoose.Schema(
         }
       },
       private: true, // used by the toJSON plugin
+    },
+    images: {
+      type: Array,
+      required: true,
     },
     isEmailVerified: {
       type: Boolean,

@@ -5,10 +5,8 @@ const ApiError = require('../utils/ApiError');
 
 const validate = (schema) => (req, res, next) => {
   const validSchema = pick(schema, ['params', 'query', 'body']);
-  console.log(validSchema);
 
   const object = pick(req, Object.keys(validSchema));
-  console.log(object);
   const { value, error } = Joi.compile(validSchema)
     .prefs({ errors: { label: 'key' }, abortEarly: false })
     .validate(object);
