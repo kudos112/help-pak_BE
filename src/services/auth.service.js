@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
+const ngoService = require('./ngo.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
@@ -18,6 +19,13 @@ const loginUserWithEmailAndPassword = async (userType, email, password) => {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
     }
     return user;
+  }
+  else if (userType === 'NGO') {
+    const ngo = await ngoService.getNgoWithEmailAndPassword(email, password);
+    if (!ngo) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+    }
+    return ngo;
   }
   throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
 

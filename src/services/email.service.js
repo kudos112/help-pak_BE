@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const config = require('../config/config');
 const logger = require('../config/logger');
+const catchAsync = require('../utils/catchAsync');
 
 // const transport = nodemailer.createTransport(config.email.smtp);
 var transport = nodemailer.createTransport({
@@ -26,10 +27,10 @@ if (config.env !== 'test') {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
+const sendEmail = catchAsync(async (to, subject, text) => {
   const msg = { from: config.email.from, to, subject, text };
   await transport.sendMail(msg);
-};
+});
 
 /**
  * Send reset password email
