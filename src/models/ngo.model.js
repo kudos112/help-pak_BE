@@ -9,30 +9,15 @@ const ngoSchema = mongoose.Schema(
     userType: {
       type: String,
       required: true,
-      enum: ['INDIVIDUAL', 'NGO'],
+      enum: ['NGO'],
       trim: true,
     },
-    ngoName: {
+    name: {
       type: String,
       required: true,
       trim: true,
     },
-    ngoRegistrationNo: {
-        type: Number,
-        required: true,
-        trim: true,
-    },
-    ngoAuthenticationCertificationImage: {
-        type: Array,
-        required: true,
-      },
-    ngoPhoneNo: {
-        type: Number,
-        required: true,
-        trim: true,
-        
-    },
-    ngoEmail: {
+    email: {
       type: String,
       required: true,
       unique: true,
@@ -44,7 +29,7 @@ const ngoSchema = mongoose.Schema(
         }
       },
     },
-    ngoPassword: {
+    password: {
       type: String,
       required: true,
       trim: true,
@@ -56,11 +41,25 @@ const ngoSchema = mongoose.Schema(
       },
       private: true, // used by the toJSON plugin
     },
-    // isEmailVerified: {
-    //   type: Boolean,
-    //   default: false,
-    //   private: true,
-    // },
+    images: {
+      type: Array,
+      required: true,
+    },
+    regNo: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    phoneNo: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+      private: true,
+    },
     enabled: {
       type: Boolean,
       default: false,
@@ -87,7 +86,8 @@ ngoSchema.plugin(paginate);
  * @param {ObjectId} [excludeNgoId] - The id of the NGO to be excluded
  * @returns {Promise<boolean>}
  */
-ngoSchema.statics.isEmailTaken = async function (email, excludeNgoId) {                     //NGO ID need to be created.....
+ngoSchema.statics.isEmailTaken = async function (email, excludeNgoId) {
+  //NGO ID need to be created.....
   const ngo = await this.findOne({ email, _id: { $ne: excludeNgoId } });
   return !!ngo;
 };

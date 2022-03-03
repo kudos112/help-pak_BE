@@ -13,6 +13,8 @@ const createNgo = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   const ngo = await Ngo.create(userBody);
+
+  console.log('Ngo created');
   if (ngo) sendEmail(userBody.email, 'Ngo successfully created', 'Ngo Successfully Created');
   return ngo;
 };

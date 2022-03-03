@@ -8,18 +8,19 @@ const userRegister = {
     name: Joi.string().required(),
     userType: Joi.string().required(),
     images: Joi.array().required(),
+    phoneNo: Joi.string().required(),
   }),
 };
 
 const ngoRegister = {
   body: Joi.object().keys({
-    ngoName: Joi.string().required(),
-    ngoRegistrationNo: Joi.number().required(),
-    ngoPhoneNo: Joi.number().required(),
-    ngoEmail: Joi.string().required().email(),
-    ngoPassword: Joi.string().required().custom(password),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().custom(password),
+    name: Joi.string().required(),
     userType: Joi.string().required(),
-    ngoAuthenticationCertificationImage: Joi.array().required(),
+    images: Joi.array().required(),
+    regNo: Joi.string().required(),
+    phoneNo: Joi.string().required(),
   }),
 };
 

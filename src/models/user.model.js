@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
     userType: {
       type: String,
       required: true,
-      enum: ['INDIVIDUAL', 'NGO'],
+      enum: ['INDIVIDUAL'],
       trim: true,
     },
     name: {
@@ -44,6 +44,11 @@ const userSchema = mongoose.Schema(
     images: {
       type: Array,
       required: true,
+    },
+    phoneNo: {
+      type: String,
+      required: true,
+      trim: true,
     },
     isEmailVerified: {
       type: Boolean,
