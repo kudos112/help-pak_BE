@@ -9,12 +9,11 @@ const { sendEmail } = require('./email.service');
  * @returns {Promise<Ngo>}
  */
 const createNgo = async (userBody) => {
-  if (await Ngo.isEmailTaken(userBody.email)) {
+  if ((await User.isEmailTaken(userBody.email)) || (await Ngo.isEmailTaken(userBody.email))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   const ngo = await Ngo.create(userBody);
 
-  console.log('Ngo created');
   if (ngo) sendEmail(userBody.email, 'Ngo successfully created', 'Ngo Successfully Created');
   return ngo;
 };

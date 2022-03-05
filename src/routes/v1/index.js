@@ -13,10 +13,6 @@ const defaultRoutes = [
     route: authRoute,
   },
   {
-    path: '/ngo',
-    route: ngoRoute,
-  },
-  {
     path: '/users',
     route: userRoute,
   },

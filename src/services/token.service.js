@@ -3,6 +3,7 @@ const moment = require('moment');
 const httpStatus = require('http-status');
 const config = require('../config/config');
 const userService = require('./user.service');
+const ngoService = require('./ngo.service');
 const { Token } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
@@ -92,12 +93,13 @@ const generateAuthTokens = async (user) => {
  */
 const generateResetPasswordToken = async (email) => {
   const user = await userService.getUserByEmail(email);
-  if (!user) {
+  const ngo = await ngoService.getNgoByEmail(email);
+  if (!user && !ngo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
   }
   const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);
-  await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);
+  const resetPasswordToken = generateToken(user?.id || ngo?.id, expires, tokenTypes.RESET_PASSWORD);
+  await saveToken(resetPasswordToken, user?.id || ngo?.id, expires, tokenTypes.RESET_PASSWORD);
   return resetPasswordToken;
 };
 

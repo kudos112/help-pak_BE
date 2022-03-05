@@ -12,15 +12,14 @@ const { tokenTypes } = require('../config/tokens');
  * @param {string} password
  * @returns {Promise<User>}
  */
-const loginUserWithEmailAndPassword = async (userType, email, password) => {
+const loginWithEmailAndPassword = async (userType, email, password) => {
   if (userType === 'INDIVIDUAL') {
     const user = await userService.getUserWithEmailAndPassword(email, password);
     if (!user) {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
     }
     return user;
-  }
-  else if (userType === 'NGO') {
+  } else if (userType === 'NGO') {
     const ngo = await ngoService.getNgoWithEmailAndPassword(email, password);
     if (!ngo) {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
@@ -75,11 +74,17 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
   try {
     const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, tokenTypes.RESET_PASSWORD);
     const user = await userService.getUserById(resetPasswordTokenDoc.user);
-    if (!user) {
+    const ngo = await ngoService.getNgoById(resetPasswordTokenDoc.user);
+    if (!user && !ngo) {
       throw new Error();
     }
-    await userService.updateUserById(user.id, { password: newPassword });
-    await Token.deleteMany({ user: user.id, type: tokenTypes.RESET_PASSWORD });
+    if (user) {
+      await userService.updateUserById(user?.id, { password: newPassword });
+      await Token.deleteMany({ user: user?.id, type: tokenTypes.RESET_PASSWORD });
+    } else {
+      await ngoService.updateNgoById(ngo?.id, { password: newPassword });
+      await Token.deleteMany({ user: ngo?.id, type: tokenTypes.RESET_PASSWORD });
+    }
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
   }
@@ -105,7 +110,7 @@ const verifyEmail = async (verifyEmailToken) => {
 };
 
 module.exports = {
-  loginUserWithEmailAndPassword,
+  loginWithEmailAndPassword,
   logout,
   refreshAuth,
   resetPassword,
