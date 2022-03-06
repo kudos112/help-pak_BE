@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Ngo } = require('../models');
+const { User, Ngo } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { sendEmail } = require('./email.service');
 
