@@ -2,6 +2,7 @@ const express = require('express');
 const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const ngoRoute = require('./ngo.route');
+const medicalAssistanceRoute = require('./medicalassistance.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 
@@ -15,6 +16,10 @@ const defaultRoutes = [
   {
     path: '/users',
     route: userRoute,
+  },
+  {
+    path: '/medical-assistance',
+    route: medicalAssistanceRoute,
   },
 ];
 

@@ -1,21 +1,25 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const userValidation = require('../../validations/user.validation');
-const userController = require('../../controllers/user.controller');
+const medicalAssistanceValidation = require('../../validations/medicalassistance.validation');
+const medicalAssistanceController = require('../../controllers/medicalassistance.controller');
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(auth('manageUsers'), validate(userValidation.createUser), userController.createUser)
-  .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers);
+ router
+   .route('/')
+  .post(auth(), validate(medicalAssistanceValidation.createMedicalAssistance), medicalAssistanceController.createMedicalAssistance)
+ // .get(auth('getMedicalAssistances'), validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
+
+//router.post('/manageMedicalAssistances', validate(medicalAssistanceValidation.createMedicalAssistance), medicalAssistanceController.createMedicalAssistance);
+router.get('/getMedicalAssistances', validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
+
 
 router
-  .route('/:userId')
-  .get(auth(), validate(userValidation.getUser), userController.getUser)
-  .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
-  .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
+  .route('/:medicalAssistanceId')
+  .get(medicalAssistanceController.getMedicalAssistance)
+  .patch(auth('manageMedicalAssistance'), validate(medicalAssistanceValidation.updateMedicalAssistance), medicalAssistanceController.updateMedicalAssistance)
+  .delete(auth('manageMedicalAssistance'), validate(medicalAssistanceValidation.deleteMedicalAssistance), medicalAssistanceController.deleteMedicalAssistance);
 
 module.exports = router;
 

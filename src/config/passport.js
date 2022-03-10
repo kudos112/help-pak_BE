@@ -1,7 +1,7 @@
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const config = require('./config');
 const { tokenTypes } = require('./tokens');
-const { User } = require('../models');
+const { User, Ngo } = require('../models');
 
 const jwtOptions = {
   secretOrKey: config.jwt.secret,
@@ -14,10 +14,11 @@ const jwtVerify = async (payload, done) => {
       throw new Error('Invalid token type');
     }
     const user = await User.findById(payload.sub);
-    if (!user) {
+    const ngo = await Ngo.findById(payload.sub);
+    if (!user && !ngo) {
       return done(null, false);
     }
-    done(null, user);
+    done(null, user || ngo);
   } catch (error) {
     done(error, false);
   }
