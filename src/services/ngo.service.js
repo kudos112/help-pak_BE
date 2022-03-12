@@ -76,12 +76,25 @@ const updateNgoById = async (ngoId, updateBody) => {
 };
 
 /**
- * Delete ngo by id
+ * softDelete ngo by id
  * @param {ObjectId} ngoId
  * @returns {Promise<Ngo>}
  */
-const deleteNgoById = async (ngoId) => {
+ const softDeleteNgoById = async (ngoId) => {
   const ngo = await getNgoById(ngoId);
+  if (!ngo) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Ngo not found');
+  }
+  ngo.deleted = true;
+  await ngo.save();
+};
+/**
+ * hardDelete ngo by id
+ * @param {ObjectId} ngoId
+ * @returns {Promise<Ngo>}
+ */
+const hardDeleteNgoById = async (ngoId) => {
+  const ngo = await Ngo.findById(ngoId);
   if (!ngo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Ngo not found');
   }
@@ -96,5 +109,6 @@ module.exports = {
   getNgoByEmail,
   getNgoWithEmailAndPassword,
   updateNgoById,
-  deleteNgoById,
+  softDeleteNgoById,
+  hardDeleteNgoById,
 };

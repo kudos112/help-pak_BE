@@ -29,8 +29,17 @@ const updateUser = catchAsync(async (req, res) => {
   res.send(user);
 });
 
-const deleteUser = catchAsync(async (req, res) => {
-  await userService.deleteUserById(req.params.userId);
+const verifyUser = catchAsync(async (req, res) => {
+  const user = await userService.verifyUserById(req.params.userId, req.body);
+  res.send(user);
+});
+
+const softDeleteUser = catchAsync(async (req, res) => {
+  await userService.softDeleteUserById(req.params.userId);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+const hardDeleteUser = catchAsync(async (req, res) => {
+  await userService.hardDeleteUserById(req.params.userId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -39,5 +48,7 @@ module.exports = {
   getUsers,
   getUser,
   updateUser,
-  deleteUser,
+  verifyUser,
+  softDeleteUser,
+  hardDeleteUser,
 };

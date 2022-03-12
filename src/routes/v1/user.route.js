@@ -15,7 +15,10 @@ router
   .route('/:userId')
   .get(auth(), validate(userValidation.getUser), userController.getUser)
   .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
-  .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
+  .delete(auth(), validate(userValidation.deleteUser), userController.softDeleteUser);
+
+router.post('/verify/:userId',auth('manageUsers'), validate(userValidation.verifyUser), userController.verifyUser);
+router.delete('/hard-delete/:userId',auth('manageUsers'), validate(userValidation.deleteUser), userController.hardDeleteUser);
 
 module.exports = router;
 

@@ -8,14 +8,16 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(auth('manageNgo'), validate(ngoValidation.createNgo), ngoController.createNgo)
-  .get(auth('getNgo'), validate(ngoValidation.getNgos), ngoController.getNgos);
+  .post(auth('manageNgos'), validate(ngoValidation.createNgo), ngoController.createNgo)
+  .get(auth('getNgos'), validate(ngoValidation.getNgos), ngoController.getNgos);
 
 router
   .route('/:ngoId')
-  .get(auth('getNgo'), validate(ngoValidation.getNgo), ngoController.getNgo)
-  .patch(auth('manageNgo'), validate(ngoValidation.updateNgo), ngoController.updateNgo)
-  .delete(auth('manageNgo'), validate(ngoValidation.deleteNgo), ngoController.deleteNgo);
+  .get(auth(), validate(ngoValidation.getNgo), ngoController.getNgo)
+  .patch(auth('manageNgos'), validate(ngoValidation.updateNgo), ngoController.updateNgo)
+  .delete(auth(), validate(ngoValidation.deleteNgo), ngoController.softDeleteNgo);
+
+router.delete('/hard-delete/:ngoId',auth('manageNgos'), validate(ngoValidation.deleteNgo), ngoController.hardDeleteNgo);
 
 module.exports = router;
 

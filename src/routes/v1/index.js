@@ -18,6 +18,10 @@ const defaultRoutes = [
     route: userRoute,
   },
   {
+    path: '/ngos',
+    route: ngoRoute,
+  },
+  {
     path: '/medical-assistance',
     route: medicalAssistanceRoute,
   },

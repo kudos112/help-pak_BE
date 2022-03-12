@@ -55,6 +55,12 @@ const ngoSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    role: {
+      type: String,
+      enum: roles,
+      default: 'ngo',
+      private: true,
+    },
     isEmailVerified: {
       type: Boolean,
       default: false,

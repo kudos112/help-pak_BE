@@ -9,10 +9,7 @@ const router = express.Router();
  router
    .route('/')
   .post(auth(), validate(medicalAssistanceValidation.createMedicalAssistance), medicalAssistanceController.createMedicalAssistance)
- // .get(auth('getMedicalAssistances'), validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
-
-//router.post('/manageMedicalAssistances', validate(medicalAssistanceValidation.createMedicalAssistance), medicalAssistanceController.createMedicalAssistance);
-router.get('/getMedicalAssistances', validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
+   router.get('/getMedicalAssistances', validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
 
 
 router

@@ -29,8 +29,12 @@ const updateNgo = catchAsync(async (req, res) => {
   res.send(ngo);
 });
 
-const deleteNgo = catchAsync(async (req, res) => {
-  await ngoService.deleteNgoById(req.params.ngoId);
+const softDeleteNgo = catchAsync(async (req, res) => {
+  await ngoService.softDeleteNgoById(req.params.ngoId);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+const hardDeleteNgo = catchAsync(async (req, res) => {
+  await ngoService.hardDeleteNgoById(req.params.ngoId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -39,5 +43,6 @@ module.exports = {
   getNgos,
   getNgo,
   updateNgo,
-  deleteNgo,
+  softDeleteNgo,
+  hardDeleteNgo,
 };

@@ -37,7 +37,9 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return User.findById(id);
+  const user = await User.findById(id);
+  if(user?.deleted === true) return null;
+  return user;
 };
 
 /**
@@ -46,11 +48,14 @@ const getUserById = async (id) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
-  return User.findOne({ email });
+  const user = await User.findOne({ email });
+  if(user?.deleted === true) return null;
+  return user;
 };
 
 const getUserWithEmailAndPassword = async (email, password) => {
   const user = await User.findOne({ email });
+  if(user?.deleted) return null;
   if (user) if (await user.isPasswordMatch(password)) return user;
   return null;
 };
@@ -75,12 +80,40 @@ const updateUserById = async (userId, updateBody) => {
 };
 
 /**
- * Delete user by id
+ * softDelete user by id
  * @param {ObjectId} userId
  * @returns {Promise<User>}
  */
-const deleteUserById = async (userId) => {
+ const softDeleteUserById = async (userId) => {
   const user = await getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  user.deleted = true;
+  await user.save();
+};
+
+/**
+ * verify user by id
+ * @param {ObjectId} userId
+ * @returns {Promise<User>}
+ */
+ const verifyUserById = async (userId) => {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  user.enabled = true;
+  await user.save();
+};
+
+/**
+ * hardDelete user by id
+ * @param {ObjectId} userId
+ * @returns {Promise<User>}
+ */
+const hardDeleteUserById = async (userId) => {
+  const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
@@ -93,7 +126,9 @@ module.exports = {
   queryUsers,
   getUserById,
   getUserByEmail,
+  verifyUserById,
   getUserWithEmailAndPassword,
   updateUserById,
-  deleteUserById,
+  softDeleteUserById,
+  hardDeleteUserById,
 };
