@@ -32,6 +32,13 @@ const login = {
   }),
 };
 
+const adminLogin = {
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+};
+
 const logout = {
   body: Joi.object().keys({
     refreshToken: Joi.string().required(),
@@ -69,6 +76,7 @@ module.exports = {
   userRegister,
   ngoRegister,
   login,
+  adminLogin,
   logout,
   refreshTokens,
   forgotPassword,

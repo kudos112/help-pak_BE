@@ -5,16 +5,15 @@ const { sendEmail } = require('./email.service');
 
 /**
  * Create a ngo
- * @param {Object} userBody
+ * @param {Object} ngoBody
  * @returns {Promise<Ngo>}
  */
-const createNgo = async (userBody) => {
-  if ((await User.isEmailTaken(userBody.email)) || (await Ngo.isEmailTaken(userBody.email))) {
+const createNgo = async (ngoBody) => {
+  if ((await User.isEmailTaken(ngoBody.email)) || (await Ngo.isEmailTaken(ngoBody.email))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  const ngo = await Ngo.create(userBody);
+  const ngo = await Ngo.create(ngoBody);
 
-  if (ngo) sendEmail(userBody.email, 'Ngo successfully created', 'Ngo Successfully Created');
   return ngo;
 };
 
@@ -38,7 +37,9 @@ const queryNgos = async (filter, options) => {
  * @returns {Promise<Ngo>}
  */
 const getNgoById = async (id) => {
-  return Ngo.findById(id);
+  const ngo = await Ngo.findById(id);
+  if (ngo?.deleted === true) return null;
+  return ngo;
 };
 
 /**
@@ -80,7 +81,7 @@ const updateNgoById = async (ngoId, updateBody) => {
  * @param {ObjectId} ngoId
  * @returns {Promise<Ngo>}
  */
- const softDeleteNgoById = async (ngoId) => {
+const softDeleteNgoById = async (ngoId) => {
   const ngo = await getNgoById(ngoId);
   if (!ngo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Ngo not found');
@@ -102,6 +103,21 @@ const hardDeleteNgoById = async (ngoId) => {
   return ngo;
 };
 
+/**
+ * verify ngo by id
+ * @param {ObjectId} ngoId
+ * @returns {Promise<User>}
+ */
+const verifyNgoById = async (ngoId) => {
+  const ngo = await getNgoById(ngoId);
+  if (!ngo) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Ngo not found');
+  }
+  ngo.enabled = true;
+  await ngo.save();
+  return ngo;
+};
+
 module.exports = {
   createNgo,
   queryNgos,
@@ -111,4 +127,5 @@ module.exports = {
   updateNgoById,
   softDeleteNgoById,
   hardDeleteNgoById,
+  verifyNgoById,
 };

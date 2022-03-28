@@ -9,18 +9,20 @@ const createNgo = {
     ngoPhoneNo: Joi.number().required(),
     ngoEmail: Joi.string().required().email(),
     ngoPassword: Joi.string().required().custom(password),
-    
- //   role: Joi.string().required().valid('user', 'admin'),
+
+    //   role: Joi.string().required().valid('user', 'admin'),
   }),
 };
 
 const getNgos = {
   query: Joi.object().keys({
-    ngoName: Joi.string(),
+    name: Joi.string(),
     role: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
+    enabled: Joi.boolean(),
+    deleted: Joi.boolean(),
   }),
 };
 
@@ -49,10 +51,17 @@ const deleteNgo = {
   }),
 };
 
+const verifyNgo = {
+  params: Joi.object().keys({
+    ngoId: Joi.string().custom(objectId),
+  }),
+};
+
 module.exports = {
   createNgo,
   getNgos,
   getNgo,
   updateNgo,
   deleteNgo,
+  verifyNgo,
 };

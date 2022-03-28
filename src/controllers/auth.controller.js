@@ -4,19 +4,32 @@ const { authService, userService, tokenService, ngoService, emailService } = req
 
 const userRegister = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
-  const tokens = await tokenService.generateAuthTokens(user);
-  res.status(httpStatus.CREATED).send({ user, tokens });
+  await emailService.sendAccountRegisterEmail(user.email);
+  res.status(httpStatus.CREATED).send({
+    message: 'Registered Successfully',
+    description: "Please wait! You'll get an email when you'll be verified",
+  });
 });
 
 const ngoRegister = catchAsync(async (req, res) => {
   const ngo = await ngoService.createNgo(req.body);
-  const tokens = await tokenService.generateAuthTokens(ngo);
-  res.status(httpStatus.CREATED).send({ ngo, tokens });
+  await emailService.sendAccountRegisterEmail(ngo.email);
+  res.status(httpStatus.CREATED).send({
+    message: 'Registered Successfully',
+    description: "Please wait! You'll get an email when you'll be verified",
+  });
 });
 
 const login = catchAsync(async (req, res) => {
   const { userType, email, password } = req.body;
   const user = await authService.loginWithEmailAndPassword(userType, email, password);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.send({ user, tokens });
+});
+
+const adminLogin = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+  const user = await authService.adminLoginWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
 });
@@ -57,6 +70,7 @@ module.exports = {
   userRegister,
   ngoRegister,
   login,
+  adminLogin,
   logout,
   refreshTokens,
   forgotPassword,

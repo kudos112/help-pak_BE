@@ -17,7 +17,8 @@ router
   .patch(auth('manageNgos'), validate(ngoValidation.updateNgo), ngoController.updateNgo)
   .delete(auth(), validate(ngoValidation.deleteNgo), ngoController.softDeleteNgo);
 
-router.delete('/hard-delete/:ngoId',auth('manageNgos'), validate(ngoValidation.deleteNgo), ngoController.hardDeleteNgo);
+router.post('/verify/:ngoId', auth('manageUsers'), validate(ngoValidation.verifyNgo), ngoController.verifyNgo);
+router.delete('/hard-delete/:ngoId', auth('manageNgos'), validate(ngoValidation.deleteNgo), ngoController.hardDeleteNgo);
 
 module.exports = router;
 

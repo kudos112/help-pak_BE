@@ -13,7 +13,6 @@ const createUser = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   const user = await User.create(userBody);
-  if (user) sendEmail(userBody.email, 'User successfully created', 'User Successfully Created');
   return user;
 };
 
@@ -38,7 +37,7 @@ const queryUsers = async (filter, options) => {
  */
 const getUserById = async (id) => {
   const user = await User.findById(id);
-  if(user?.deleted === true) return null;
+  if (user?.deleted === true) return null;
   return user;
 };
 
@@ -49,13 +48,13 @@ const getUserById = async (id) => {
  */
 const getUserByEmail = async (email) => {
   const user = await User.findOne({ email });
-  if(user?.deleted === true) return null;
+  if (user?.deleted === true) return null;
   return user;
 };
 
 const getUserWithEmailAndPassword = async (email, password) => {
   const user = await User.findOne({ email });
-  if(user?.deleted) return null;
+  if (user?.deleted) return null;
   if (user) if (await user.isPasswordMatch(password)) return user;
   return null;
 };
@@ -84,13 +83,14 @@ const updateUserById = async (userId, updateBody) => {
  * @param {ObjectId} userId
  * @returns {Promise<User>}
  */
- const softDeleteUserById = async (userId) => {
+const softDeleteUserById = async (userId) => {
   const user = await getUserById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
   user.deleted = true;
   await user.save();
+  return user;
 };
 
 /**
@@ -98,13 +98,14 @@ const updateUserById = async (userId, updateBody) => {
  * @param {ObjectId} userId
  * @returns {Promise<User>}
  */
- const verifyUserById = async (userId) => {
+const verifyUserById = async (userId) => {
   const user = await getUserById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
   user.enabled = true;
   await user.save();
+  return user;
 };
 
 /**

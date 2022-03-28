@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { ngoService } = require('../services');
+const { ngoService, emailService } = require('../services');
 
 const createNgo = catchAsync(async (req, res) => {
   const ngo = await ngoService.createNgo(req.body);
@@ -10,7 +10,7 @@ const createNgo = catchAsync(async (req, res) => {
 });
 
 const getNgos = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'role']);
+  const filter = pick(req.query, ['name', 'role', 'enabled', 'deleted']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await ngoService.queryNgos(filter, options);
   res.send(result);
@@ -21,6 +21,12 @@ const getNgo = catchAsync(async (req, res) => {
   if (!ngo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Ngo not found');
   }
+  res.send(ngo);
+});
+
+const verifyNgo = catchAsync(async (req, res) => {
+  const ngo = await ngoService.verifyNgoById(req.params.ngoId, req.body);
+  await emailService.sendVerificationEmail(ngo.email);
   res.send(ngo);
 });
 
@@ -45,4 +51,5 @@ module.exports = {
   updateNgo,
   softDeleteNgo,
   hardDeleteNgo,
+  verifyNgo,
 };
