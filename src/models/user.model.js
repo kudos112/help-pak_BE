@@ -77,6 +77,12 @@ const userSchema = mongoose.Schema(
   }
 );
 
+userSchema.virtual('medicalAssistanceDetail', {
+  ref: 'MedicalAssistance',
+  localField: '_id',
+  foreignField: 'provider'
+})
+
 // add plugin that converts mongoose to json
 userSchema.plugin(toJSON);
 userSchema.plugin(paginate);

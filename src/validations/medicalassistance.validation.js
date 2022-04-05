@@ -5,21 +5,26 @@ const createMedicalAssistance = {
   body: Joi.object().keys({
     name: Joi.string().required(),
     email: Joi.string().required().email(),
-    CNIC: Joi.number().integer().required(),
-    contact: Joi.number().integer().required(),
+    phoneNo: Joi.number().integer().required(),
+    streetAddress: Joi.string().required(),
+    city: Joi.string().required(),
     description: Joi.string().required(),
     servicetype: Joi.string().required(),
-    medicalservicelocation: Joi.string().required(),
-    medicalservicetime: Joi.string().required(),
-    medicalservicedate: Joi.string().required(),
-    image: Joi.array().required(),
+    location: Joi.string().required(),
+    startTime: Joi.string(),
+    endTime: Joi.string(),
+    fullDay: Joi.boolean().required(),
+    days: Joi.array().required(),
+    images: Joi.array().required(),
   }),
 };
 
 const getMedicalAssistances = {
   query: Joi.object().keys({
     name: Joi.string(),
-    CNIC: Joi.number().integer(),
+    description: Joi.string(),
+    servicetype: Joi.string(),
+    location: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
@@ -34,14 +39,24 @@ const getMedicalAssistance = {
 
 const updateMedicalAssistance = {
   params: Joi.object().keys({
-    medicalAssistanceId: Joi.required().custom(objectId),
+    medicalAssistanceId: Joi.string().custom(objectId),
   }),
   body: Joi.object()
     .keys({
-      email: Joi.string().email(),
-      password: Joi.string().custom(password),
       name: Joi.string(),
-    })
+      email: Joi.string().email(),
+      phoneNo: Joi.number(),
+      streetAddress: Joi.string(),
+      city: Joi.string(),
+      description: Joi.string(),
+      servicetype: Joi.string(),
+      location: Joi.string(),
+      startTime: Joi.string(),
+      endTime: Joi.string(),
+      fullDay: Joi.boolean(),
+      days: Joi.array(),
+      images: Joi.array(),
+      })
     .min(1),
 };
 

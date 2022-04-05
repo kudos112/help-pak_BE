@@ -4,15 +4,17 @@ const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
 const { string } = require('joi');
+// const { timestamps } = require('joi');
+// const { location } = require('joi');
 
 const medicalAssistanceSchema = mongoose.Schema(
     {
-      name: {
+      name: {      
         type: String,
         required: true,
         trim: true,
       },
-      email: {
+      email: {     
         type: String,
         required: true,
         trim: true,
@@ -23,46 +25,55 @@ const medicalAssistanceSchema = mongoose.Schema(
           }
         },
       },
-      CNIC: {
+      phoneNo: {      //phoneNo
           type: Number,
           required: true,
-          unique: true,
+          unique: false,
           trim: true,
       },
-      contact: {
-          type: Number,
-          required: true,
-          unique: true,
-          trim: true,
+      streetAddress:{
+        type: String,
+        required: true,
+        unique: false,
+      },
+      city: {
+        type: String,
+        required: true,
+        unique: false,
+      },
+      provider: {      
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
       },
       description: {
           type: String,
           required: true,
-          unique: false,
-          trim: false,
       },
-      servicetype: {
+      servicetype: { 
           type: String,
           required: true,
           enum: ['physical','online'],
           trim: true,
       },
-      medicalservicelocation: {
-          type: String,
+      location: {    
+          type: String,//Location,
           required: true,
-          unique: false,
-          trim: false,
       },
-      medicalservicetime: {
-          type: String,
-          required: true,
-          unique: false,
+      startTime: {      
+          type: String,//timestamps,
       },
-      medicalservicedate: {
-          type: String,
+      endTime: {      
+        type: String,//timestamps,
+      },
+      fullDay: {      
+          type: Boolean,
           required: true,
-          unique: true,
-          trim: true,
+          },
+      days: {      
+        type: Array,
+        required: true,
+        trim: true,
       },
       images: {
         type: Array,

@@ -8,16 +8,25 @@ const router = express.Router();
 
  router
    .route('/')
-  .post(auth(), validate(medicalAssistanceValidation.createMedicalAssistance), medicalAssistanceController.createMedicalAssistance)
-   router.get('/getMedicalAssistances', validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
+   .post(auth(), validate(medicalAssistanceValidation.createMedicalAssistance), medicalAssistanceController.createMedicalAssistance)
+   router.get('/getAllMedicalAssistances', validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
+   //below route is not perform working
+   router.get('/getUserMedicalAssistances', auth(), validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getUserMedicalAssistances); 
+/*
 
+async (filter, options) => {
+  const medicalAssistances = await MedicalAssistance.paginate(filter, options);
+  return medicalAssistances;
+
+*/
 
 router
   .route('/:medicalAssistanceId')
   .get(medicalAssistanceController.getMedicalAssistance)
-  .patch(auth('manageMedicalAssistance'), validate(medicalAssistanceValidation.updateMedicalAssistance), medicalAssistanceController.updateMedicalAssistance)
-  .delete(auth('manageMedicalAssistance'), validate(medicalAssistanceValidation.deleteMedicalAssistance), medicalAssistanceController.deleteMedicalAssistance);
+  .patch(auth(), validate(medicalAssistanceValidation.updateMedicalAssistance), medicalAssistanceController.updateMedicalAssistance)
+  .delete(auth(), validate(medicalAssistanceValidation.deleteMedicalAssistance), medicalAssistanceController.softdeleteMedicalAssistance);
 
+  router.delete('/hard-delete/:medicalAssistanceId',auth(/*'manageUsers'*/), validate(medicalAssistanceValidation.deleteMedicalAssistance), medicalAssistanceController.hardDeleteMedicalAssistance);
 module.exports = router;
 
 /**
