@@ -3,19 +3,19 @@ const { password, objectId } = require('./custom.validation');
 
 const createMedicalAssistance = {
   body: Joi.object().keys({
+    serviceType: Joi.string().required(),
     name: Joi.string().required(),
     email: Joi.string().required().email(),
     phoneNo: Joi.number().integer().required(),
-    streetAddress: Joi.string().required(),
+    fullAddress: Joi.string().required(),
     city: Joi.string().required(),
     description: Joi.string().required(),
-    servicetype: Joi.string().required(),
-    location: Joi.string().required(),
-    startTime: Joi.string(),
-    endTime: Joi.string(),
+    location: Joi.string().optional(),
+    startTime: Joi.string().optional(),
+    endTime: Joi.string().optional(),
     fullDay: Joi.boolean().required(),
-    days: Joi.array().required(),
-    images: Joi.array().required(),
+    workingDays: Joi.array().min(1).required(),
+    images: Joi.array().min(1).required(),
   }),
 };
 
@@ -28,6 +28,8 @@ const getMedicalAssistances = {
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
+    enabled: Joi.boolean(),
+    deleted: Joi.boolean(),
   }),
 };
 
@@ -46,7 +48,7 @@ const updateMedicalAssistance = {
       name: Joi.string(),
       email: Joi.string().email(),
       phoneNo: Joi.number(),
-      streetAddress: Joi.string(),
+      fullAddress: Joi.string(),
       city: Joi.string(),
       description: Joi.string(),
       servicetype: Joi.string(),
@@ -56,11 +58,17 @@ const updateMedicalAssistance = {
       fullDay: Joi.boolean(),
       days: Joi.array(),
       images: Joi.array(),
-      })
+    })
     .min(1),
 };
 
 const deleteMedicalAssistance = {
+  params: Joi.object().keys({
+    medicalAssistanceId: Joi.string().custom(objectId),
+  }),
+};
+
+const verifyMedicalAssistance = {
   params: Joi.object().keys({
     medicalAssistanceId: Joi.string().custom(objectId),
   }),
@@ -72,4 +80,5 @@ module.exports = {
   getMedicalAssistance,
   updateMedicalAssistance,
   deleteMedicalAssistance,
+  verifyMedicalAssistance,
 };

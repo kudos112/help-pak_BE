@@ -66,6 +66,12 @@ const verifyEmail = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const getUserDetails = catchAsync(async (req, res) => {
+  const user = await authService.getLoggedInUserDetails(req.user);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.send({ user, tokens });
+});
+
 module.exports = {
   userRegister,
   ngoRegister,
@@ -77,4 +83,5 @@ module.exports = {
   resetPassword,
   sendVerificationEmail,
   verifyEmail,
+  getUserDetails,
 };

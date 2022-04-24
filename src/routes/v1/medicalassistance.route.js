@@ -6,27 +6,43 @@ const medicalAssistanceController = require('../../controllers/medicalassistance
 
 const router = express.Router();
 
- router
-   .route('/')
-   .post(auth(), validate(medicalAssistanceValidation.createMedicalAssistance), medicalAssistanceController.createMedicalAssistance)
-   router.get('/getAllMedicalAssistances', validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
-   //below route is not perform working
-   router.get('/getUserMedicalAssistances', auth(), validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getUserMedicalAssistances); 
-/*
-
-async (filter, options) => {
-  const medicalAssistances = await MedicalAssistance.paginate(filter, options);
-  return medicalAssistances;
-
-*/
+router
+  .route('/')
+  .post(
+    auth(),
+    validate(medicalAssistanceValidation.createMedicalAssistance),
+    medicalAssistanceController.createMedicalAssistance
+  )
+  .get(validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
 
 router
   .route('/:medicalAssistanceId')
   .get(medicalAssistanceController.getMedicalAssistance)
-  .patch(auth(), validate(medicalAssistanceValidation.updateMedicalAssistance), medicalAssistanceController.updateMedicalAssistance)
-  .delete(auth(), validate(medicalAssistanceValidation.deleteMedicalAssistance), medicalAssistanceController.softdeleteMedicalAssistance);
+  .patch(
+    auth(),
+    validate(medicalAssistanceValidation.updateMedicalAssistance),
+    medicalAssistanceController.updateMedicalAssistance
+  )
+  .delete(
+    auth(),
+    validate(medicalAssistanceValidation.deleteMedicalAssistance),
+    medicalAssistanceController.softdeleteMedicalAssistance
+);
+  
+router.post(
+  '/verify/:medicalAssistanceId',
+  auth('manageUsers'),
+  validate(medicalAssistanceValidation.verifyMedicalAssistance),
+  medicalAssistanceController.verifyMedicalAssistance
+);
 
-  router.delete('/hard-delete/:medicalAssistanceId',auth(/*'manageUsers'*/), validate(medicalAssistanceValidation.deleteMedicalAssistance), medicalAssistanceController.hardDeleteMedicalAssistance);
+router.delete(
+  '/hard-delete/:medicalAssistanceId',
+  auth('manageUsers'),
+  validate(medicalAssistanceValidation.deleteMedicalAssistance),
+  medicalAssistanceController.hardDeleteMedicalAssistance
+);
+
 module.exports = router;
 
 /**

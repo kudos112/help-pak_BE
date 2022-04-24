@@ -5,15 +5,12 @@ const { roleRights } = require('../config/roles');
 
 const verifyCallback = (req, resolve, reject, requiredRights) => async (err, user, info) => {
   if (err) {
-    console.log(err);
     return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Token Not found'));
   }
-  if (info) {
-    console.log(info);
-    return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Info not found'));
-  }
-  if (!user) {
-    console.log(user);
+  // if (info) {
+  //   return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Info not found'));
+  // }
+  if (!user || info) {
     return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
   }
   req.user = user;

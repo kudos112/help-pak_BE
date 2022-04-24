@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
     userType: {
       type: String,
       required: true,
-      enum: ['INDIVIDUAL'],
+      enum: ['INDIVIDUAL', 'NGO'],
       trim: true,
     },
     name: {
@@ -41,12 +41,7 @@ const userSchema = mongoose.Schema(
       },
       private: true, // used by the toJSON plugin
     },
-    role: {
-      type: String,
-      enum: roles,
-      default: 'user',
-      private: true,
-    },
+
     images: {
       type: Array,
       required: true,
@@ -55,6 +50,17 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+    },
+    regNo: {
+      // for ngos
+      type: String,
+      trim: true,
+    },
+    role: {
+      type: String,
+      enum: roles,
+      default: 'user',
+      private: true,
     },
     isEmailVerified: {
       type: Boolean,
@@ -80,8 +86,8 @@ const userSchema = mongoose.Schema(
 userSchema.virtual('medicalAssistanceDetail', {
   ref: 'MedicalAssistance',
   localField: '_id',
-  foreignField: 'provider'
-})
+  foreignField: 'provider',
+});
 
 // add plugin that converts mongoose to json
 userSchema.plugin(toJSON);

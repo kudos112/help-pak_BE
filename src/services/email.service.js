@@ -52,6 +52,22 @@ You'll get an verification Email when you'll be verified\n\n Thanks.\nHelpPak`;
 };
 
 /**
+ * Send medical service creation email
+ * @param {string} to
+ * @returns {Promise}
+ */
+const sendCreateMedicalService = async (to) => {
+  const subject = 'Medical Service Created';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+First of all kudos to you because you've done great by providing free medical servcies.
+Admin is going to verify your credentials until unless you can
+explore the website or can give us a short review.\n
+You'll get an verification Email when your given details will be verified and on the table.\n\n Thanks.\n Admin HelpPak`;
+  await sendEmail(to, subject, text);
+};
+
+/**
  * Send unverified account email
  * @param {string} to
  * @returns {Promise}
@@ -115,6 +131,24 @@ If you did not create an account, then ignore this email.`;
   await sendEmail(to, subject, text);
 };
 
+/**
+ * Send medical Assistance verification email
+ * @param {string} to
+ * @returns {Promise}
+ */
+
+const sendMedicalAssistanceVerficationEmail = async (to, medicalAssistance) => {
+  const subject = 'HelpPak Account Verified';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+Your medical Assistance with title "${medicalAssistance.name}" has been Verfied.\n\n
+Now every needy user is able to see and contact to you.
+You're appealed to help all of them who might contact you or reach you by our context thanks in advance.
+Admin and team will always be there for you for any inconvenience you have.\n\n
+Plus Admin is going to verify everything you'll create here.\n\n Thanks.\nHelpPak`;
+  await sendEmail(to, subject, text);
+};
+
 module.exports = {
   transport,
   sendEmail,
@@ -123,4 +157,6 @@ module.exports = {
   sendUnverifiedAccountEmail,
   sendAccountRegisterEmail,
   sendAccountVerficationEmail,
+  sendCreateMedicalService,
+  sendMedicalAssistanceVerficationEmail,
 };

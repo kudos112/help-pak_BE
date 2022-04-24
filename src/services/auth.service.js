@@ -123,6 +123,20 @@ const verifyEmail = async (verifyEmailToken) => {
   }
 };
 
+/**
+ * Get Logged In User Details email
+ * @returns {Promise(User)}
+ */
+const getLoggedInUserDetails = async (userId) => {
+  try {
+    const user = await userService.getUserById(userId);
+    const ngo = await ngoService.getNgoById(userId);
+    return user || ngo;
+  } catch (error) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User Not found');
+  }
+};
+
 module.exports = {
   loginWithEmailAndPassword,
   adminLoginWithEmailAndPassword,
@@ -130,4 +144,5 @@ module.exports = {
   refreshAuth,
   resetPassword,
   verifyEmail,
+  getLoggedInUserDetails,
 };
