@@ -52,6 +52,12 @@ const medicalCampSchema = mongoose.Schema(
           unique: false,
           trim: true,
       },
+      role: {
+        type: String,
+        enum: roles,
+        default: 'provider',
+        private: true,
+      },
       contact: {
           type: Number,
           required: true,

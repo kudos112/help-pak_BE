@@ -19,8 +19,10 @@ router
   .route('/:medicalCampId')
   .get(medicalCampController.getMedicalCamp)
   .patch(validate(medicalCampValidation.updateMedicalCamp), medicalCampController.updateMedicalCamp)
-  .delete(validate(medicalCampValidation.deleteMedicalCamp), medicalCampController.deleteMedicalCamp);
+  .delete(validate(medicalCampValidation.deleteMedicalCamp), medicalCampController.softDeleteMedicalCamp);
 
+  router.post('/verify/:medicalCampId',auth('manageMedicalCamps'), validate(medicalCampValidation.verifyMedicalCamp), medicalCampController.verifyMedicalCamp);
+  router.delete('/hard-delete/:medicalCampId', auth('manageMedicalCamps'), validate(medicalCampValidation.deleteMedicalCamp), medicalCampController.hardDeleteMedicalCamp);
 module.exports = router;
 
 /**

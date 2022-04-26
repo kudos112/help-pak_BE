@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { MedicalCamp } = require('../models');
+const MedicalCamp = require('../models/medicalcamp.model');
 const ApiError = require('../utils/ApiError');
 const { sendEmail } = require('./email.service');
 
@@ -30,13 +30,16 @@ const queryMedicalCamps = async (filter, options) => {
 };
 
 /**
- * Get Medical Camp by id
+ * Get medical camp by id
  * @param {ObjectId} id
  * @returns {Promise<MedicalCamp>}
  */
-const getMedicalCampById = async (id) => {
-  return MedicalCamp.findById(id);
+ const getMedicalCampById = async (id) => {
+  const medicalCamp = await MedicalCamp.findById(id);
+  if (medicalCamp?.deleted === true) return null;
+  return medicalCamp;
 };
+
 
 /**
  * Get Provider Medical Camp by id
@@ -57,14 +60,6 @@ const getMedicalCampById = async (id) => {
 const getMedicalCampByEmail = async (email) => {
   return MedicalCamp.findOne({ provideremail });
 };
-/** Not need to get medical services with password and email both. Task done with the help of medicalAssistanceId.
- * 
-const getMedicalCampWithEmailAndPassword = async (email, password) => {
-  const medicalCamp = await MedicalCamp.findOne({ email });
-  if (medicalCamp) if (await medicalCamp.isPasswordMatch(password)) return medicalCamp;
-  return null;
-};
-*/
 
 /**
  * Update medical Camp Service by id
@@ -86,14 +81,43 @@ const updateMedicalCampById = async (medicalCampId, updateBody) => {
 };
 
 /**
- * Delete medical Camp Service by id
+ * verify medical camp by id
  * @param {ObjectId} medicalCampId
  * @returns {Promise<MedicalCamp>}
  */
-const deleteMedicalCampById = async (medicalCampId) => {
+ const verifyMedicalCampById = async (medicalCampId) => {
   const medicalCamp = await getMedicalCampById(medicalCampId);
   if (!medicalCamp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found');
+  }
+  medicalCamp.enabled = true;
+  await medicalCamp.save();
+  return medicalCamp;
+};
+
+/**
+ * softDelete medicalCamp by id
+ * @param {ObjectId} medicalCampId
+ * @returns {Promise<MedicalCamp>}
+ */
+ const softDeleteMedicalCampById = async (medicalCampId) => {
+  const medicalCamp = await getMedicalCampById(medicalCampId);
+  if (!medicalCamp) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found');
+  }
+  medicalCamp.deleted = true;
+  await medicalCamp.save();
+};
+
+/**
+ * hardDelete medical camp by id
+ * @param {ObjectId} medicalCampId
+ * @returns {Promise<MedicalCamp>}
+ */
+ const hardDeleteMedicalCampById = async (medicalCampId) => {
+  const medicalCamp = await MedicalCamp.findById(medicalCampId);
+  if (!medicalCamp) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medicals Camp not found');
   }
   await medicalCamp.remove();
   return medicalCamp;
@@ -105,7 +129,8 @@ module.exports = {
   getMedicalCampById,
   getProviderMedicalCampById,
   getMedicalCampByEmail,
- // getMedicalAssistanceWithEmailAndPassword,
   updateMedicalCampById,
-  deleteMedicalCampById,
+  verifyMedicalCampById,
+  softDeleteMedicalCampById,
+  hardDeleteMedicalCampById,
 };

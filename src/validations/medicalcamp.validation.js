@@ -9,6 +9,7 @@ const createMedicalCamp = {
     providername: Joi.string().required(),
     provideremail: Joi.string().required().email(),
     providerid: Joi.number().integer().required(),
+    role: Joi.string().required().valid('provider', 'admin'),
     contact: Joi.number().integer().required(),
     description: Joi.string().required(),
     starttime: Joi.string().required(),
@@ -22,6 +23,7 @@ const getMedicalCamps = {
   query: Joi.object().keys({
     providername: Joi.string(),
     providerid: Joi.number().integer(),
+    role: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
@@ -35,6 +37,12 @@ const getProviderMedicalCamps = {
   };
 
 const getMedicalCamp = {
+  params: Joi.object().keys({
+    medicalCampId: Joi.string().custom(objectId),
+  }),
+};
+
+const verifyMedicalCamp = {
   params: Joi.object().keys({
     medicalCampId: Joi.string().custom(objectId),
   }),
@@ -66,5 +74,6 @@ module.exports = {
   getProviderMedicalCamps,
   getMedicalCamp,
   updateMedicalCamp,
+  verifyMedicalCamp,
   deleteMedicalCamp,
 };
