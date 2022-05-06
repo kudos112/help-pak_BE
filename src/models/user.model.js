@@ -51,8 +51,8 @@ const userSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    //for ngos
     regNo: {
-      // for ngos
       type: String,
       trim: true,
     },
@@ -60,7 +60,6 @@ const userSchema = mongoose.Schema(
       type: String,
       enum: roles,
       default: 'user',
-      private: true,
     },
     isEmailVerified: {
       type: Boolean,

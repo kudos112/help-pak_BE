@@ -21,8 +21,8 @@ const ngoRegister = catchAsync(async (req, res) => {
 });
 
 const login = catchAsync(async (req, res) => {
-  const { userType, email, password } = req.body;
-  const user = await authService.loginWithEmailAndPassword(userType, email, password);
+  const { email, password } = req.body;
+  const user = await authService.loginWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
 });

@@ -12,27 +12,28 @@ const { tokenTypes } = require('../config/tokens');
  * @param {string} password
  * @returns {Promise<User>}
  */
-const loginWithEmailAndPassword = async (userType, email, password) => {
-  if (userType === 'INDIVIDUAL') {
-    const user = await userService.getUserWithEmailAndPassword(email, password);
-    if (!user) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
-    }
-    if (user.enabled === false) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, "Please wait! You'll get an email when you'll be verified");
-    }
-    return user;
-  } else if (userType === 'NGO') {
-    const ngo = await ngoService.getNgoWithEmailAndPassword(email, password);
-    if (!ngo) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
-    }
-    if (ngo.enabled === false) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, "Please wait! You'll get an email when you'll be verified");
-    }
-    return ngo;
+const loginWithEmailAndPassword = async (email, password) => {
+  const user = await userService.getUserWithEmailAndPassword(email, password);
+  if (!user || user.deleted === true) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
   }
-  throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+  if (user.enabled === false) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Please wait! You'll get an email when you'll be verified");
+  }
+  return user;
+
+  // else if ( userType === 'NGO' )
+  // {
+  //   const ngo = await ngoService.getNgoWithEmailAndPassword(email, password);
+  //   if (!ngo) {
+  //     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+  //   }
+  //   if (ngo.enabled === false) {
+  //     throw new ApiError(httpStatus.UNAUTHORIZED, "Please wait! You'll get an email when you'll be verified");
+  //   }
+  //   return ngo;
+  // }
+  // throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
 
   // else
   // cons user = await ngoService.getUserByEmail( email );
@@ -74,7 +75,7 @@ const refreshAuth = async (refreshToken) => {
     await refreshTokenDoc.remove();
     return tokenService.generateAuthTokens(user);
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Please login again');
   }
 };
 
@@ -88,17 +89,19 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
   try {
     const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, tokenTypes.RESET_PASSWORD);
     const user = await userService.getUserById(resetPasswordTokenDoc.user);
-    const ngo = await ngoService.getNgoById(resetPasswordTokenDoc.user);
-    if (!user && !ngo) {
+    // const ngo = await ngoService.getNgoById(resetPasswordTokenDoc.user);
+    if (!user) {
       throw new Error();
     }
-    if (user) {
-      await userService.updateUserById(user?.id, { password: newPassword });
-      await Token.deleteMany({ user: user?.id, type: tokenTypes.RESET_PASSWORD });
-    } else {
-      await ngoService.updateNgoById(ngo?.id, { password: newPassword });
-      await Token.deleteMany({ user: ngo?.id, type: tokenTypes.RESET_PASSWORD });
-    }
+    // if (user) {
+    await userService.updateUserById(user?.id, { password: newPassword });
+    await Token.deleteMany({ user: user?.id, type: tokenTypes.RESET_PASSWORD });
+    // }
+    // else
+    // {
+    //   await ngoService.updateNgoById(ngo?.id, { password: newPassword });
+    //   await Token.deleteMany({ user: ngo?.id, type: tokenTypes.RESET_PASSWORD });
+    // }
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
   }
@@ -130,8 +133,8 @@ const verifyEmail = async (verifyEmailToken) => {
 const getLoggedInUserDetails = async (userId) => {
   try {
     const user = await userService.getUserById(userId);
-    const ngo = await ngoService.getNgoById(userId);
-    return user || ngo;
+    // const ngo = await ngoService.getNgoById(userId);
+    return user;
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'User Not found');
   }
