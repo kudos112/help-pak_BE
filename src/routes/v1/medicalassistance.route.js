@@ -6,6 +6,12 @@ const medicalAssistanceController = require('../../controllers/medicalassistance
 
 const router = express.Router();
 
+router.get(
+  '/user/:userId',
+  validate(medicalAssistanceValidation.getMedicalAssistanceByUserId),
+  medicalAssistanceController.getMedicalAssistanceByUserId
+);
+
 router
   .route('/')
   .post(
@@ -27,8 +33,8 @@ router
     auth(),
     validate(medicalAssistanceValidation.deleteMedicalAssistance),
     medicalAssistanceController.softdeleteMedicalAssistance
-);
-  
+  );
+
 router.post(
   '/verify/:medicalAssistanceId',
   auth('manageUsers'),

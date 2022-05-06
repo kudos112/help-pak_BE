@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
@@ -14,16 +15,23 @@ const createMedicalAssistance = catchAsync(async (req, res) => {
 });
 
 const getMedicalAssistances = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'servicetype', 'city', 'enabled', 'deleted']);
+  const filter = pick(req.query, ['name', 'serviceType', 'city', 'enabled', 'deleted']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await medicalAssistanceService.queryMedicalAssitances(filter, options);
   res.send(result);
 });
 
-const getUserMedicalAssistances = catchAsync(async (req, res) => {
-  //not working
-  const medicalAssistance = await medicalAssistanceService.getUserMedicalAssitancesbyID(req.user.id);
-  res.send(medicalAssistance);
+const getMedicalAssistanceByUserId = catchAsync(async (req, res) => {
+  // const _filter = pick(req.query, ['name', 'serviceType', 'city', 'enabled', 'deleted']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+
+  const result = await medicalAssistanceService.queryMedicalAssitances(
+    {
+      $and: [{ provider: mongoose.Types.ObjectId(req.params.userId) }, { deleted: false }, { enabled: true }],
+    },
+    options
+  );
+  res.send(result);
 });
 
 const getMedicalAssistance = catchAsync(async (req, res) => {
@@ -54,6 +62,7 @@ const softdeleteMedicalAssistance = catchAsync(async (req, res) => {
   if (req.user.role === 'admin') emailService.sendUnverifiedAccountEmail(medicalAssistance.email);
   res.status(httpStatus.NO_CONTENT).send();
 });
+
 const hardDeleteMedicalAssistance = catchAsync(async (req, res) => {
   await medicalAssistanceService.hardDeleteMedicalAssistanceById(req.params.medicalAssistanceId);
   res.status(httpStatus.NO_CONTENT).send();
@@ -62,10 +71,9 @@ const hardDeleteMedicalAssistance = catchAsync(async (req, res) => {
 module.exports = {
   createMedicalAssistance,
   getMedicalAssistances,
-  getUserMedicalAssistances,
+  getMedicalAssistanceByUserId,
   getMedicalAssistance,
   updateMedicalAssistance,
-  // deleteMedicalAssistance,
   softdeleteMedicalAssistance,
   hardDeleteMedicalAssistance,
   verifyMedicalAssistance,

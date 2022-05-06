@@ -21,13 +21,12 @@ const createMedicalAssistance = {
 
 const getMedicalAssistances = {
   query: Joi.object().keys({
-    name: Joi.string(),
-    description: Joi.string(),
-    servicetype: Joi.string(),
-    location: Joi.string(),
-    sortBy: Joi.string(),
-    limit: Joi.number().integer(),
-    page: Joi.number().integer(),
+    name: Joi.string().allow('').allow(null),
+    serviceType: Joi.string().allow('').allow(null),
+    city: Joi.string().allow('').allow(null),
+    sortBy: Joi.string().allow('').allow(null),
+    limit: Joi.number().integer().allow('').allow(null),
+    page: Joi.number().integer().allow('').allow(null),
     enabled: Joi.boolean(),
     deleted: Joi.boolean(),
   }),
@@ -74,6 +73,12 @@ const verifyMedicalAssistance = {
   }),
 };
 
+const getMedicalAssistanceByUserId = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+};
+
 module.exports = {
   createMedicalAssistance,
   getMedicalAssistances,
@@ -81,4 +86,5 @@ module.exports = {
   updateMedicalAssistance,
   deleteMedicalAssistance,
   verifyMedicalAssistance,
+  getMedicalAssistanceByUserId,
 };

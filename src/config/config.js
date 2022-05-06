@@ -2,14 +2,14 @@ const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
 
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+dotenv.config({ path: path.join(__dirname, `../../.env.${process.env.NODE_ENV}`) });
+console.log(path.join(__dirname, `../../.env.${process.env.NODE_ENV}`));
 
 const envVarsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(3000),
     MONGODB_URL: Joi.string().required().description('Mongo DB url'),
-    DEV_MONGODB_URL: Joi.string().required().description('Mongo DB url'),
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
     JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
@@ -38,7 +38,7 @@ module.exports = {
   port: envVars.PORT,
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
-    dev_url: envVars.DEV_MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
+    // dev_url: envVars.DEV_MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     options: {
       useCreateIndex: true,
       useNewUrlParser: true,
