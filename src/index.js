@@ -4,9 +4,9 @@ const config = require('./config/config');
 const logger = require('./config/logger');
 
 let server;
-let url = '';
-if (process.env.NODE_ENV === 'production') url = config.mongoose.url;
-else url = config.mongoose.dev_url;
+// if ( process.env.NODE_ENV === 'production' )
+let url = config.mongoose.url;
+// else url = config.mongoose.dev_url;
 mongoose.connect(url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
   server = app.listen(config.port, () => {

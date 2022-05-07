@@ -30,7 +30,7 @@ const updateUser = catchAsync(async (req, res) => {
 });
 
 const verifyUser = catchAsync(async (req, res) => {
-  const user = await userService.verifyUserById(req.params.userId, req.body);
+  const user = await userService.verifyUserById(req.params.userId);
   await emailService.sendAccountVerficationEmail(user.email);
   res.send(user);
 });

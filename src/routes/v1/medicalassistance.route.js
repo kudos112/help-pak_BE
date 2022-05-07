@@ -6,17 +6,48 @@ const medicalAssistanceController = require('../../controllers/medicalassistance
 
 const router = express.Router();
 
- router
-   .route('/')
-  .post(auth(), validate(medicalAssistanceValidation.createMedicalAssistance), medicalAssistanceController.createMedicalAssistance)
-   router.get('/getMedicalAssistances', validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
+router.get(
+  '/user/:userId',
+  validate(medicalAssistanceValidation.getMedicalAssistanceByUserId),
+  medicalAssistanceController.getMedicalAssistanceByUserId
+);
 
+router
+  .route('/')
+  .post(
+    auth(),
+    validate(medicalAssistanceValidation.createMedicalAssistance),
+    medicalAssistanceController.createMedicalAssistance
+  )
+  .get(validate(medicalAssistanceValidation.getMedicalAssistances), medicalAssistanceController.getMedicalAssistances);
 
 router
   .route('/:medicalAssistanceId')
   .get(medicalAssistanceController.getMedicalAssistance)
-  .patch(auth('manageMedicalAssistance'), validate(medicalAssistanceValidation.updateMedicalAssistance), medicalAssistanceController.updateMedicalAssistance)
-  .delete(auth('manageMedicalAssistance'), validate(medicalAssistanceValidation.deleteMedicalAssistance), medicalAssistanceController.deleteMedicalAssistance);
+  .patch(
+    auth(),
+    validate(medicalAssistanceValidation.updateMedicalAssistance),
+    medicalAssistanceController.updateMedicalAssistance
+  )
+  .delete(
+    auth(),
+    validate(medicalAssistanceValidation.deleteMedicalAssistance),
+    medicalAssistanceController.softdeleteMedicalAssistance
+  );
+
+router.post(
+  '/verify/:medicalAssistanceId',
+  auth('manageUsers'),
+  validate(medicalAssistanceValidation.verifyMedicalAssistance),
+  medicalAssistanceController.verifyMedicalAssistance
+);
+
+router.delete(
+  '/hard-delete/:medicalAssistanceId',
+  auth('manageUsers'),
+  validate(medicalAssistanceValidation.deleteMedicalAssistance),
+  medicalAssistanceController.hardDeleteMedicalAssistance
+);
 
 module.exports = router;
 

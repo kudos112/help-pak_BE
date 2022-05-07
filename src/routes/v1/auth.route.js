@@ -16,6 +16,7 @@ router.post('/reset-password', validate(authValidation.resetPassword), authContr
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
 router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
 router.post('/admin/login', validate(authValidation.adminLogin), authController.adminLogin);
+router.get('/user-details', auth(), authController.getUserDetails);
 
 module.exports = router;
 

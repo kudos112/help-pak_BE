@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
 const { User, Ngo } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { sendEmail } = require('./email.service');
 
 /**
  * Create a user
@@ -11,6 +10,10 @@ const { sendEmail } = require('./email.service');
 const createUser = async (userBody) => {
   if ((await User.isEmailTaken(userBody.email)) || (await Ngo.isEmailTaken(userBody.email))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  if (userBody.userType === 'NGO') {
+    if (userBody.regNo) userBody = { ...userBody, role: 'ngo' };
+    else throw new ApiError(httpStatus.BAD_REQUEST, 'Ngo Registration number is requried to signup');
   }
   const user = await User.create(userBody);
   return user;

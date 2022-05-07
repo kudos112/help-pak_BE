@@ -36,6 +36,12 @@ const paginate = (schema) => {
     const page = options.page && parseInt(options.page, 10) > 0 ? parseInt(options.page, 10) : 1;
     const skip = (page - 1) * limit;
 
+    Object.keys(filter).forEach((key) => {
+      if (filter[key] === '') {
+        delete filter[key];
+      }
+    });
+
     const countPromise = this.countDocuments(filter).exec();
     let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
 
@@ -56,7 +62,7 @@ const paginate = (schema) => {
       const [totalResults, results] = values;
       const totalPages = Math.ceil(totalResults / limit);
       const result = {
-        results,
+        data: results,
         page,
         limit,
         totalPages,

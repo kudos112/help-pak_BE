@@ -9,9 +9,13 @@ const { sendEmail } = require('./email.service');
  * @returns {Promise<MedicalAssistance>}
  */
 const createMedicalAssistance = async (medicalAssistanceBody) => {
-
   const medicalAssistance = await MedicalAssistance.create(medicalAssistanceBody);
-  if (medicalAssistance) sendEmail(medicalAssistanceBody.email, 'Medical Assistance Service successfully created', 'Medical Assistance Service Successfully Created');
+  if (medicalAssistance)
+    sendEmail(
+      medicalAssistanceBody.email,
+      'Medical Assistance Service successfully created',
+      'Medical Assistance Service Successfully Created'
+    );
   return medicalAssistance;
 };
 
@@ -25,6 +29,12 @@ const createMedicalAssistance = async (medicalAssistanceBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryMedicalAssitances = async (filter, options) => {
+  if (filter.name) {
+    filter = {
+      ...filter,
+      name: new RegExp(`${filter.name}`, 'i'),
+    };
+  }
   const medicalAssistances = await MedicalAssistance.paginate(filter, options);
   return medicalAssistances;
 };
@@ -37,23 +47,6 @@ const queryMedicalAssitances = async (filter, options) => {
 const getMedicalAssistanceById = async (id) => {
   return MedicalAssistance.findById(id);
 };
-
-/**
- * Get Medical Assistance by email
- * @param {string} email
- * @returns {Promise<MedicalAssistance>}
- */
-const getMedicalAssistanceByEmail = async (email) => {
-  return MedicalAssistance.findOne({ email });
-};
-/** Not need to get medical services with password and email both. Task done with the help of medicalAssistanceId.
- * 
-const getMedicalAssistanceWithEmailAndPassword = async (email, password) => {
-  const medicalAssistance = await MedicalAssistance.findOne({ email });
-  if (medicalAssistance) if (await medicalAssistance.isPasswordMatch(password)) return medicalAssistance;
-  return null;
-};
-*/
 
 /**
  * Update medical Assistance Service by id
@@ -88,12 +81,20 @@ const deleteMedicalAssistanceById = async (medicalAssistanceId) => {
   return medicalAssistance;
 };
 
+/**
+ * Get Medical Assistance by id
+ * @param {ObjectId} id
+ * @returns {Promise<MedicalAssistance>}
+ */
+const getMedicalAssistancesByUserId = async (id) => {
+  return MedicalAssistance.findById(id);
+};
+
 module.exports = {
   createMedicalAssistance,
   queryMedicalAssitances,
   getMedicalAssistanceById,
-  getMedicalAssistanceByEmail,
- // getMedicalAssistanceWithEmailAndPassword,
   updateMedicalAssistanceById,
   deleteMedicalAssistanceById,
+  getMedicalAssistancesByUserId,
 };

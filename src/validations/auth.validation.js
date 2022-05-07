@@ -9,6 +9,7 @@ const userRegister = {
     userType: Joi.string().required(),
     images: Joi.array().required(),
     phoneNo: Joi.string().required(),
+    regNo: Joi.string().allow(null).allow(''),
   }),
 };
 
@@ -26,7 +27,6 @@ const ngoRegister = {
 
 const login = {
   body: Joi.object().keys({
-    userType: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.string().required(),
   }),

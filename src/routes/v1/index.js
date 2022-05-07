@@ -23,7 +23,7 @@ const defaultRoutes = [
     route: ngoRoute,
   },
   {
-    path: '/medical-assistance',
+    path: '/medicalassistance',
     route: medicalAssistanceRoute,
   },
   {
