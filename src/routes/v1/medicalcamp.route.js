@@ -6,23 +6,29 @@ const medicalCampController = require('../../controllers/medicalcamp.controller'
 
 const router = express.Router();
 
- router
-   .route('/')
-  .post(validate(medicalCampValidation.createMedicalCamp), medicalCampController.createMedicalCamp)
-   router.get('/getMedicalCamps', validate(medicalCampValidation.getMedicalCamps), medicalCampController.getMedicalCamps);
+router.route('/').post(validate(medicalCampValidation.createMedicalCamp), medicalCampController.createMedicalCamp);
+router.get('/getMedicalCamps', validate(medicalCampValidation.getMedicalCamps), medicalCampController.getMedicalCamps);
+
+router.route('/getcamps/:organizerId').get(medicalCampController.getProviderMedicalCamps);
 
 router
-    .route('/getcamps/:providerid')
-   .get(medicalCampController.getProviderMedicalCamps);
-
-router
-  .route('/:medicalCampId')
+  .route('/:campId')
   .get(medicalCampController.getMedicalCamp)
   .patch(validate(medicalCampValidation.updateMedicalCamp), medicalCampController.updateMedicalCamp)
   .delete(validate(medicalCampValidation.deleteMedicalCamp), medicalCampController.softDeleteMedicalCamp);
 
-  router.post('/verify/:medicalCampId',auth('manageMedicalCamps'), validate(medicalCampValidation.verifyMedicalCamp), medicalCampController.verifyMedicalCamp);
-  router.delete('/hard-delete/:medicalCampId', auth('manageMedicalCamps'), validate(medicalCampValidation.deleteMedicalCamp), medicalCampController.hardDeleteMedicalCamp);
+router.post(
+  '/verify/:campId',
+  auth('manageMedicalCamps'),
+  validate(medicalCampValidation.verifyMedicalCamp),
+  medicalCampController.verifyMedicalCamp
+);
+router.delete(
+  '/hard-delete/:campId',
+  auth('manageMedicalCamps'),
+  validate(medicalCampValidation.deleteMedicalCamp),
+  medicalCampController.hardDeleteMedicalCamp
+);
 module.exports = router;
 
 /**

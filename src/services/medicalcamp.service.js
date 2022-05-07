@@ -9,9 +9,13 @@ const { sendEmail } = require('./email.service');
  * @returns {Promise<MedicalCamp>}
  */
 const createMedicalCamp = async (medicalCampBody) => {
-
   const medicalCamp = await MedicalCamp.create(medicalCampBody);
-  if (medicalCamp) sendEmail(medicalCampBody.email, 'Medical Camp Service successfully created', 'Medical Camp Service Successfully Created');
+  if (medicalCamp)
+    sendEmail(
+      medicalCampBody.email,
+      'Medical Camp Service successfully created',
+      'Medical Camp Service Successfully Created'
+    );
   return medicalCamp;
 };
 
@@ -34,23 +38,20 @@ const queryMedicalCamps = async (filter, options) => {
  * @param {ObjectId} id
  * @returns {Promise<MedicalCamp>}
  */
- const getMedicalCampById = async (id) => {
+const getMedicalCampById = async (id) => {
   const medicalCamp = await MedicalCamp.findById(id);
   if (medicalCamp?.deleted === true) return null;
   return medicalCamp;
 };
-
 
 /**
  * Get Provider Medical Camp by id
  * @param {ObjectId} id
  * @returns {Promise<MedicalCamp>}
  */
- const getProviderMedicalCampById = async (providerid) => {
-     
-    //console.log("yes");
-    return MedicalCamp.findById(providerid);
-  };
+const getProviderMedicalCampById = async (organizerId) => {
+  return MedicalCamp.findById(organizerId);
+};
 
 /**
  * Get Medical Camp by email
@@ -58,21 +59,21 @@ const queryMedicalCamps = async (filter, options) => {
  * @returns {Promise<MedicalCamp>}
  */
 const getMedicalCampByEmail = async (email) => {
-  return MedicalCamp.findOne({ provideremail });
+  return MedicalCamp.findOne({ organizerEmail });
 };
 
 /**
  * Update medical Camp Service by id
- * @param {ObjectId} medicalCampId
+ * @param {ObjectId} campId
  * @param {Object} updateBody
  * @returns {Promise<MedicalCamp>}
  */
-const updateMedicalCampById = async (medicalCampId, updateBody) => {
-  const medicalCamp = await getMedicalCampById(medicalCampId);
+const updateMedicalCampById = async (campId, updateBody) => {
+  const medicalCamp = await getMedicalCampById(campId);
   if (!medicalCamp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found. No service available by provider');
   }
-  if (updateBody.email && (await MedicalCamp.isEmailTaken(updateBody.email, medicalCampId))) {
+  if (updateBody.email && (await MedicalCamp.isEmailTaken(updateBody.email, campId))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   Object.assign(medicalCamp, updateBody);
@@ -82,11 +83,11 @@ const updateMedicalCampById = async (medicalCampId, updateBody) => {
 
 /**
  * verify medical camp by id
- * @param {ObjectId} medicalCampId
+ * @param {ObjectId} campId
  * @returns {Promise<MedicalCamp>}
  */
- const verifyMedicalCampById = async (medicalCampId) => {
-  const medicalCamp = await getMedicalCampById(medicalCampId);
+const verifyMedicalCampById = async (campId) => {
+  const medicalCamp = await getMedicalCampById(campId);
   if (!medicalCamp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found');
   }
@@ -97,11 +98,11 @@ const updateMedicalCampById = async (medicalCampId, updateBody) => {
 
 /**
  * softDelete medicalCamp by id
- * @param {ObjectId} medicalCampId
+ * @param {ObjectId} campId
  * @returns {Promise<MedicalCamp>}
  */
- const softDeleteMedicalCampById = async (medicalCampId) => {
-  const medicalCamp = await getMedicalCampById(medicalCampId);
+const softDeleteMedicalCampById = async (campId) => {
+  const medicalCamp = await getMedicalCampById(campId);
   if (!medicalCamp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found');
   }
@@ -111,11 +112,11 @@ const updateMedicalCampById = async (medicalCampId, updateBody) => {
 
 /**
  * hardDelete medical camp by id
- * @param {ObjectId} medicalCampId
+ * @param {ObjectId} campId
  * @returns {Promise<MedicalCamp>}
  */
- const hardDeleteMedicalCampById = async (medicalCampId) => {
-  const medicalCamp = await MedicalCamp.findById(medicalCampId);
+const hardDeleteMedicalCampById = async (campId) => {
+  const medicalCamp = await MedicalCamp.findById(campId);
   if (!medicalCamp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medicals Camp not found');
   }

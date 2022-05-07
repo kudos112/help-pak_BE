@@ -10,23 +10,21 @@ const createMedicalCamp = catchAsync(async (req, res) => {
 });
 
 const getMedicalCamps = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['campname', 'camptype', 'enabled', 'deleted']);
+  const filter = pick(req.query, ['name', 'type', 'enabled', 'deleted']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await medicalCampService.queryMedicalCamps(filter, options);
   res.send(result);
 });
 
 const getProviderMedicalCamps = catchAsync(async (req, res) => {
-    
-    const medicalCamp = await medicalCampService.getProviderMedicalCampById(req.params.providerid);
-    if (!medicalCamp) {
+  const medicalCamp = await medicalCampService.getProviderMedicalCampById(req.params.organizerId);
+  if (!medicalCamp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp Service not found');
-    }
-    res.send(medicalCamp);
-
-  });
+  }
+  res.send(medicalCamp);
+});
 const getMedicalCamp = catchAsync(async (req, res) => {
-  const medicalCamp = await medicalCampService.getMedicalCampById(req.params.medicalCampId);
+  const medicalCamp = await medicalCampService.getMedicalCampById(req.params.campId);
   if (!medicalCamp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp Service not found');
   }
@@ -34,23 +32,23 @@ const getMedicalCamp = catchAsync(async (req, res) => {
 });
 
 const updateMedicalCamp = catchAsync(async (req, res) => {
-  const medicalCamp = await medicalCampService.updateMedicalCampById(req.params.medicalCampId, req.body);
+  const medicalCamp = await medicalCampService.updateMedicalCampById(req.params.campId, req.body);
   res.send(medicalCamp);
 });
 
 const verifyMedicalCamp = catchAsync(async (req, res) => {
-  const medicalCamp = await medicalCampService.verifyMedicalCampById(req.params.MedicalCampId, req.body);
+  const medicalCamp = await medicalCampService.verifyMedicalCampById(req.params.campId, req.body);
   await emailService.sendAccountVerficationEmail(medicalCamp.email);
   res.send(medicalCamp);
 });
 
 const softDeleteMedicalCamp = catchAsync(async (req, res) => {
-  const medicalCamp = await medicalCampService.softDeleteMedicalCampById(req.params.medicalCampId);
+  const medicalCamp = await medicalCampService.softDeleteMedicalCampById(req.params.campId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 const hardDeleteMedicalCamp = catchAsync(async (req, res) => {
-  await medicalCampService.hardDeleteMedicalCampById(req.params.medicalCampId);
+  await medicalCampService.hardDeleteMedicalCampById(req.params.campId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

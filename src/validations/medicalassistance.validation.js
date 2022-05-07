@@ -6,7 +6,7 @@ const createMedicalAssistance = {
     name: Joi.string().required(),
     email: Joi.string().required().email(),
     CNIC: Joi.number().integer().required(),
-    contact: Joi.number().integer().required(),
+    phoneNo: Joi.number().integer().required(),
     description: Joi.string().required(),
     servicetype: Joi.string().required(),
     medicalservicelocation: Joi.string().required(),
