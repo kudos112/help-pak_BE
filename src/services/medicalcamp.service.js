@@ -1,5 +1,7 @@
 const httpStatus = require('http-status');
-const MedicalCamp = require('../models/medicalcamp.model');
+const mongoose = require('mongoose');
+const Doctors = require('../models/medical-camp/doctors.model');
+const MedicalCamp = require('../models/medical-camp/medicalcamp.model');
 const ApiError = require('../utils/ApiError');
 const { sendEmail } = require('./email.service');
 
@@ -8,8 +10,26 @@ const { sendEmail } = require('./email.service');
  * @param {Object} medicalCampBody
  * @returns {Promise<MedicalCamp>}
  */
-const createMedicalCamp = async (medicalCampBody) => {
-  const medicalCamp = await MedicalCamp.create(medicalCampBody);
+const createMedicalCamp = async (userId, medicalCampBody) => {
+  if (await MedicalCamp.isNameTaken(medicalCampBody.name)) throw new ApiError(httpStatus.BAD_REQUEST, 'name already taken');
+
+  const campId = new mongoose.Types.ObjectId();
+  const doctors = await Doctors.create({
+    data: medicalCampBody.doctors,
+    campId,
+  });
+
+  let newCampBody = { ...medicalCampBody };
+
+  delete newCampBody['doctors'];
+
+  const medicalCamp = await MedicalCamp.create({
+    _id: campId,
+    doctors: doctors._id,
+    noOfDoctors: medicalCampBody.doctors.length,
+    organizerId: userId,
+    ...newCampBody,
+  });
   if (medicalCamp)
     sendEmail(
       medicalCampBody.email,
@@ -29,6 +49,12 @@ const createMedicalCamp = async (medicalCampBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryMedicalCamps = async (filter, options) => {
+  if (filter.name) {
+    filter = {
+      ...filter,
+      name: new RegExp(`${filter.name}`, 'i'),
+    };
+  }
   const medicalCamps = await MedicalCamp.paginate(filter, options);
   return medicalCamps;
 };
@@ -39,8 +65,8 @@ const queryMedicalCamps = async (filter, options) => {
  * @returns {Promise<MedicalCamp>}
  */
 const getMedicalCampById = async (id) => {
-  const medicalCamp = await MedicalCamp.findById(id);
-  if (medicalCamp?.deleted === true) return null;
+  const medicalCamp = await MedicalCamp.findById(id).deepPopulate(`doctors`).exec();
+  if (!medicalCamp || medicalCamp?.deleted === true) return null;
   return medicalCamp;
 };
 
@@ -50,16 +76,11 @@ const getMedicalCampById = async (id) => {
  * @returns {Promise<MedicalCamp>}
  */
 const getProviderMedicalCampById = async (organizerId) => {
-  return MedicalCamp.findById(organizerId);
-};
-
-/**
- * Get Medical Camp by email
- * @param {string} email
- * @returns {Promise<MedicalCamp>}
- */
-const getMedicalCampByEmail = async (email) => {
-  return MedicalCamp.findOne({ organizerEmail });
+  const camp = await MedicalCamp.findById(organizerId).deepPopulate(`doctors`).exec();
+  if (!camp) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found');
+  }
+  return camp;
 };
 
 /**
@@ -68,17 +89,41 @@ const getMedicalCampByEmail = async (email) => {
  * @param {Object} updateBody
  * @returns {Promise<MedicalCamp>}
  */
-const updateMedicalCampById = async (campId, updateBody) => {
+const updateMedicalCampById = async (campId, updateBody, userId) => {
   const medicalCamp = await getMedicalCampById(campId);
-  if (!medicalCamp) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found. No service available by provider');
+
+  if (
+    !medicalCamp ||
+    !medicalCamp.enabled ||
+    medicalCamp.deleted ||
+    (medicalCamp && medicalCamp.organizerId.toString() != userId.toString())
+  ) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No Medical Camp found against this id');
   }
-  if (updateBody.email && (await MedicalCamp.isEmailTaken(updateBody.email, campId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+
+  if (updateBody.name && (await MedicalCamp.isNameTaken(updateBody.name, campId))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'name already taken');
   }
-  Object.assign(medicalCamp, updateBody);
+
+  const doctors = await Doctors.findOne({
+    campId,
+  }).exec();
+  doctors.data = updateBody.doctors;
+  await doctors.save();
+
+  let newCampBody = { ...updateBody, noOfDoctors: doctors.data.length };
+
+  delete newCampBody['doctors'];
+
+  const newMedicalCamp = {
+    doctors: doctors._id,
+    ...newCampBody,
+  };
+
+  Object.assign(medicalCamp, newMedicalCamp);
   await medicalCamp.save();
-  return medicalCamp;
+  const updated = await getMedicalCampById(campId);
+  return updated;
 };
 
 /**
@@ -129,7 +174,6 @@ module.exports = {
   queryMedicalCamps,
   getMedicalCampById,
   getProviderMedicalCampById,
-  getMedicalCampByEmail,
   updateMedicalCampById,
   verifyMedicalCampById,
   softDeleteMedicalCampById,

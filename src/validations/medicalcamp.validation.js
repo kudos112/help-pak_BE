@@ -4,17 +4,21 @@ const { password, objectId } = require('./custom.validation');
 const createMedicalCamp = {
   body: Joi.object().keys({
     name: Joi.string().required(),
-    type: Joi.string().required(),
+    campType: Joi.string().required(),
+    email: Joi.string().required().email(),
     city: Joi.string().required(),
     fullAddress: Joi.string().required(),
     organizerName: Joi.string().required(),
     organizerEmail: Joi.string().required().email(),
-    organizerId: Joi.number().integer().required(),
+    // organizerId: Joi.number().integer().required(),
     phoneNo: Joi.number().integer().required(),
     description: Joi.string().required(),
     startTime: Joi.string().required(),
     endTime: Joi.string().required(),
-    scheduledDays: Joi.array().required(),
+    startDate: Joi.date().required(),
+    endDate: Joi.date().optional(),
+    doctors: Joi.array().min(1).required(),
+    // scheduledDays: Joi.array().required(),
     images: Joi.array().required(),
   }),
 };
@@ -54,10 +58,19 @@ const updateMedicalCamp = {
   }),
   body: Joi.object()
     .keys({
-      organizerEmail: Joi.string().email(),
-      password: Joi.string().custom(password),
-      organizerName: Joi.string(),
-      name: Joi.string(),
+      email: Joi.string().optional().email(),
+      city: Joi.string().optional(),
+      fullAddress: Joi.string().optional(),
+      organizerName: Joi.string().optional(),
+      organizerEmail: Joi.string().optional().email(),
+      phoneNo: Joi.number().integer().optional(),
+      description: Joi.string().optional(),
+      startTime: Joi.string().optional(),
+      endTime: Joi.string().optional(),
+      startDate: Joi.date().optional(),
+      endDate: Joi.date().optional(),
+      doctors: Joi.array().min(1).optional(),
+      images: Joi.array().optional(),
     })
     .min(1),
 };

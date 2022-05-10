@@ -1,18 +1,20 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const { toJSON, paginate } = require('./plugins');
+const { toJSON, paginate } = require('../plugins');
+const deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 const medicalCampSchema = mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
+      unique: true,
       trim: true,
     },
-    type: {
+    campType: {
       type: String,
       required: true,
-      enum: ['eye', 'blood'],
+      trim: true,
     },
     description: {
       type: String,
@@ -29,12 +31,8 @@ const medicalCampSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    organizerName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    organizerEmail: {
+    email: {
+      //camp official email
       type: String,
       required: true,
       trim: true,
@@ -44,10 +42,6 @@ const medicalCampSchema = mongoose.Schema(
           throw new Error('Invalid email');
         }
       },
-    },
-    organizerId: {
-      type: Number,
-      required: true,
     },
     phoneNo: {
       type: Number,
@@ -62,13 +56,48 @@ const medicalCampSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    scheduledDays: {
-      type: Array,
+    startDate: {
+      type: Date,
       required: true,
     },
+    endDate: {
+      type: Date,
+    },
+    // scheduledDays: {
+    //   type: Array,
+    //   required: true,
+    // },
     images: {
       type: Array,
       required: true,
+    },
+    noOfDoctors: {
+      type: Number,
+      required: true,
+    },
+    doctors: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Doctors',
+      required: true,
+    },
+    organizerName: {
+      type: String,
+      trim: true,
+    },
+    organizerEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
+    },
+    organizerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
     },
     enabled: {
       type: Boolean,
@@ -89,6 +118,18 @@ const medicalCampSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 medicalCampSchema.plugin(toJSON);
 medicalCampSchema.plugin(paginate);
+medicalCampSchema.plugin(deepPopulate);
+
+/**
+ * Check if name is taken
+ * @param {string} name - The medical camp's name
+ * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
+ * @returns {Promise<boolean>}
+ */
+medicalCampSchema.statics.isNameTaken = async function (name, excludeUserId) {
+  const camp = await this.findOne({ name, _id: { $ne: excludeUserId } });
+  return !!camp;
+};
 
 /**
  * @typedef MedicalCamp
