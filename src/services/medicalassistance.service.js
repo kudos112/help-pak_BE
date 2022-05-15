@@ -8,17 +8,15 @@ const { sendEmail } = require('./email.service');
  * @param {Object} medicalAssistanceBody
  * @returns {Promise<MedicalAssistance>}
  */
-const createMedicalAssistance = async (medicalAssistanceBody) => {
-  const medicalAssistance = await MedicalAssistance.create(medicalAssistanceBody);
-  if (medicalAssistance)
-    sendEmail(
-      medicalAssistanceBody.email,
-      'Medical Assistance Service successfully created',
-      'Medical Assistance Service Successfully Created'
-    );
-  return medicalAssistance;
+const createMedicalAssistance = async (user, medicalAssistanceBody) => {
+  const generateassistance = new MedicalAssistance({
+    ...medicalAssistanceBody,
+    provider: user.id,
+    providerName: user.name,
+  });
+  await generateassistance.save();
+  return generateassistance;
 };
-
 /**
  * Query for medical assistance services
  * @param {Object} filter - Mongo filter
@@ -68,20 +66,6 @@ const updateMedicalAssistanceById = async (medicalAssistanceId, updateBody) => {
 };
 
 /**
- * Delete medical Assistance Service by id
- * @param {ObjectId} medicalAssistanceId
- * @returns {Promise<MedicalAssistance>}
- */
-const deleteMedicalAssistanceById = async (medicalAssistanceId) => {
-  const medicalAssistance = await getMedicalAssistanceById(medicalAssistanceId);
-  if (!medicalAssistance) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found');
-  }
-  await medicalAssistance.remove();
-  return medicalAssistance;
-};
-
-/**
  * Get Medical Assistance by id
  * @param {ObjectId} id
  * @returns {Promise<MedicalAssistance>}
@@ -90,11 +74,63 @@ const getMedicalAssistancesByUserId = async (id) => {
   return MedicalAssistance.findById(id);
 };
 
+/**
+ * softDelete medical Assistance Service by id
+ * Delete medical Assistance Service by id
+ * @param {ObjectId} medicalAssistanceId
+ * @returns {Promise<MedicalAssistance>}
+ */
+const softDeleteMedicalAssistanceById = async (medicalAssistanceId) => {
+  const medicalAssistance = await getMedicalAssistanceById(medicalAssistanceId);
+  if (!medicalAssistance) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found');
+  }
+  medicalAssistance.deleted = true;
+  await medicalAssistance.save();
+  return medicalAssistance;
+};
+
+/**
+ * hardDelete medical Assistance Service by id
+ * @param {ObjectId} medicalAssistanceId
+ * Get Medical Assistance by id
+ * @param {ObjectId} id
+ * @returns {Promise<MedicalAssistance>}
+ */
+const hardDeleteMedicalAssistanceById = async (userId, medicalAssistanceId) => {
+  const medicalAssistance = await MedicalAssistance.findOne({
+    _id: medicalAssistanceId,
+    provider: userId,
+  });
+  if (!medicalAssistance) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found');
+  }
+  await medicalAssistance.remove();
+  return medicalAssistance;
+};
+
+/**
+ * verify medical assistance by id
+ * @param {ObjectId} medicalAssistanceId
+ * @returns {Promise<MedicalAssistance>}
+ */
+const verifyMedicalAssistanceById = async (medicalAssistanceId) => {
+  const medicalAssistance = await getMedicalAssistanceById(medicalAssistanceId);
+  if (!medicalAssistance) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found');
+  }
+  medicalAssistance.enabled = true;
+  await medicalAssistance.save();
+  return medicalAssistance;
+};
+
 module.exports = {
   createMedicalAssistance,
   queryMedicalAssitances,
   getMedicalAssistanceById,
   updateMedicalAssistanceById,
-  deleteMedicalAssistanceById,
+  softDeleteMedicalAssistanceById,
+  hardDeleteMedicalAssistanceById,
+  verifyMedicalAssistanceById,
   getMedicalAssistancesByUserId,
 };

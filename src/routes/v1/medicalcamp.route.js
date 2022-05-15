@@ -7,7 +7,7 @@ const medicalCampController = require('../../controllers/medicalcamp.controller'
 const router = express.Router();
 
 router.route('/').post([auth(), validate(medicalCampValidation.createMedicalCamp)], medicalCampController.createMedicalCamp);
-router.get('/getMedicalCamps', validate(medicalCampValidation.getMedicalCamps), medicalCampController.getMedicalCamps);
+router.get('/', validate(medicalCampValidation.getMedicalCamps), medicalCampController.getMedicalCamps);
 
 router.route('/getcamps/:organizerId').get(medicalCampController.getMedicalCampByOrganizerId);
 
@@ -22,6 +22,12 @@ router.post(
   auth('manageMedicalCamps'),
   validate(medicalCampValidation.verifyMedicalCamp),
   medicalCampController.verifyMedicalCamp
+);
+router.post(
+  '/disable/:campId',
+  auth('manageMedicalCamps'),
+  validate(medicalCampValidation.disableMedicalCamp),
+  medicalCampController.disableMedicalCamp
 );
 router.delete(
   '/hard-delete/:campId',

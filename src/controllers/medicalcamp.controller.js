@@ -3,15 +3,19 @@ const mongoose = require('mongoose');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { medicalCampService } = require('../services');
+const { medicalCampService, emailService } = require('../services');
 
 const createMedicalCamp = catchAsync(async (req, res) => {
-  const medicalCamp = await medicalCampService.createMedicalCamp(req.user.id, req.body);
-  res.status(httpStatus.CREATED).send(medicalCamp);
+  await medicalCampService.createMedicalCamp(req.user, req.body);
+  await emailService.sendCreateMedicalCamp(req.body.email);
+  res.status(httpStatus.CREATED).send({
+    message: 'Successfull',
+    description: "Please wait! You'll get an email when your provided details will be verified by admin",
+  });
 });
 
 const getMedicalCamps = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'type', 'enabled', 'deleted']);
+  const filter = pick(req.query, ['name', 'campType', 'enabled', 'deleted', 'new', 'city']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await medicalCampService.queryMedicalCamps(filter, options);
   res.send(result);
@@ -44,13 +48,19 @@ const updateMedicalCamp = catchAsync(async (req, res) => {
 });
 
 const verifyMedicalCamp = catchAsync(async (req, res) => {
-  const medicalCamp = await medicalCampService.verifyMedicalCampById(req.params.campId, req.body);
+  const medicalCamp = await medicalCampService.verifyMedicalCampById(req.params.campId);
+  await emailService.sendAccountVerficationEmail(medicalCamp.email);
+  res.send(medicalCamp);
+});
+
+const disableMedicalCamp = catchAsync(async (req, res) => {
+  const medicalCamp = await medicalCampService.disableMedicalCampById(req.params.campId);
   await emailService.sendAccountVerficationEmail(medicalCamp.email);
   res.send(medicalCamp);
 });
 
 const softDeleteMedicalCamp = catchAsync(async (req, res) => {
-  const medicalCamp = await medicalCampService.softDeleteMedicalCampById(req.params.campId);
+  await medicalCampService.softDeleteMedicalCampById(req.params.campId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -68,4 +78,5 @@ module.exports = {
   verifyMedicalCamp,
   softDeleteMedicalCamp,
   hardDeleteMedicalCamp,
+  disableMedicalCamp,
 };

@@ -8,16 +8,16 @@ const createMedicalCamp = {
     email: Joi.string().required().email(),
     city: Joi.string().required(),
     fullAddress: Joi.string().required(),
-    organizerName: Joi.string().required(),
-    organizerEmail: Joi.string().required().email(),
+    // organizerName: Joi.string().required(),
+    // organizerEmail: Joi.string().required().email(),
     // organizerId: Joi.number().integer().required(),
     phoneNo: Joi.number().integer().required(),
     description: Joi.string().required(),
     startTime: Joi.string().required(),
     endTime: Joi.string().required(),
     startDate: Joi.date().required(),
-    endDate: Joi.date().optional(),
-    doctors: Joi.array().min(1).required(),
+    endDate: Joi.date().optional().allow('').allow(null),
+    doctors: Joi.array().min(0).required(),
     // scheduledDays: Joi.array().required(),
     images: Joi.array().required(),
   }),
@@ -31,6 +31,12 @@ const getMedicalCamps = {
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
+    enabled: Joi.boolean(),
+    deleted: Joi.boolean(),
+    new: Joi.boolean(),
+    city: Joi.string().allow(""),
+    campType: Joi.string().allow(""),
+    name: Joi.string().allow(""),
   }),
 };
 
@@ -47,6 +53,12 @@ const getMedicalCamp = {
 };
 
 const verifyMedicalCamp = {
+  params: Joi.object().keys({
+    campId: Joi.string().custom(objectId),
+  }),
+};
+
+const disableMedicalCamp = {
   params: Joi.object().keys({
     campId: Joi.string().custom(objectId),
   }),
@@ -88,5 +100,6 @@ module.exports = {
   getMedicalCamp,
   updateMedicalCamp,
   verifyMedicalCamp,
+  disableMedicalCamp,
   deleteMedicalCamp,
 };

@@ -63,22 +63,20 @@ const medicalCampSchema = mongoose.Schema(
     endDate: {
       type: Date,
     },
-    // scheduledDays: {
-    //   type: Array,
-    //   required: true,
-    // },
     images: {
       type: Array,
       required: true,
     },
     noOfDoctors: {
       type: Number,
-      required: true,
+      default: 0,
+      // required: true,
     },
     doctors: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Doctors',
-      required: true,
+      // required: true,
+      default: null,
     },
     organizerName: {
       type: String,
@@ -99,10 +97,18 @@ const medicalCampSchema = mongoose.Schema(
       required: true,
       ref: 'User',
     },
+    status: {
+      type: String,
+      default: 'New',
+    },
+
+    new: {
+      type: Boolean,
+      default: true,
+    },
     enabled: {
       type: Boolean,
       default: false,
-      private: true,
     },
     deleted: {
       type: Boolean,

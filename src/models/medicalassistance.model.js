@@ -40,18 +40,6 @@ const medicalAssistanceSchema = mongoose.Schema(
     serviceType: {
       type: String,
       required: true,
-      enum: [
-        'Mental health care',
-        'Dental care',
-        'Laboratory and diagnostic care',
-        'Substance abuse treatment',
-        'Preventative care',
-        'Physical and occupational therapy',
-        'Nutritional support',
-        'Pharmaceutical care',
-        'Transportation',
-        'Prenatal care',
-      ],
       trim: true,
     },
     fullAddress: {

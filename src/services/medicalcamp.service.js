@@ -10,7 +10,7 @@ const { sendEmail } = require('./email.service');
  * @param {Object} medicalCampBody
  * @returns {Promise<MedicalCamp>}
  */
-const createMedicalCamp = async (userId, medicalCampBody) => {
+const createMedicalCamp = async (user, medicalCampBody) => {
   if (await MedicalCamp.isNameTaken(medicalCampBody.name)) throw new ApiError(httpStatus.BAD_REQUEST, 'name already taken');
 
   const campId = new mongoose.Types.ObjectId();
@@ -27,15 +27,17 @@ const createMedicalCamp = async (userId, medicalCampBody) => {
     _id: campId,
     doctors: doctors._id,
     noOfDoctors: medicalCampBody.doctors.length,
-    organizerId: userId,
+    organizerId: user.id,
+    organizerName: user.name,
+    organizerEmail: user.email,
     ...newCampBody,
   });
-  if (medicalCamp)
-    sendEmail(
-      medicalCampBody.email,
-      'Medical Camp Service successfully created',
-      'Medical Camp Service Successfully Created'
-    );
+  // if (medicalCamp)
+  //   sendEmail(
+  //     medicalCampBody.email,
+  //     'Medical Camp Service successfully created',
+  //     'Medical Camp Service Successfully Created'
+  //   );
   return medicalCamp;
 };
 
@@ -105,13 +107,16 @@ const updateMedicalCampById = async (campId, updateBody, userId) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'name already taken');
   }
 
+  let newCampBody = { ...updateBody };
   const doctors = await Doctors.findOne({
     campId,
   }).exec();
-  doctors.data = updateBody.doctors;
-  await doctors.save();
+  if (updateBody.doctors) {
+    doctors.data = updateBody.doctors;
+    await doctors.save();
 
-  let newCampBody = { ...updateBody, noOfDoctors: doctors.data.length };
+    newCampBody = { ...newCampBody, noOfDoctors: doctors.data.length };
+  }
 
   delete newCampBody['doctors'];
 
@@ -137,6 +142,25 @@ const verifyMedicalCampById = async (campId) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found');
   }
   medicalCamp.enabled = true;
+  medicalCamp.new = false;
+  medicalCamp.status = 'Live';
+  await medicalCamp.save();
+  return medicalCamp;
+};
+
+/**
+ * disable medical camp by id
+ * @param {ObjectId} campId
+ * @returns {Promise<MedicalCamp>}
+ */
+const disableMedicalCampById = async (campId) => {
+  const medicalCamp = await getMedicalCampById(campId);
+  if (!medicalCamp) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found');
+  }
+  medicalCamp.enabled = false;
+  medicalCamp.new = false;
+  medicalCamp.status = 'Disabled';
   await medicalCamp.save();
   return medicalCamp;
 };
@@ -152,6 +176,9 @@ const softDeleteMedicalCampById = async (campId) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Camp not found');
   }
   medicalCamp.deleted = true;
+  medicalCamp.new = false;
+  medicalCamp.enabled = false;
+  medicalCamp.status = 'Deleted';
   await medicalCamp.save();
 };
 
@@ -178,4 +205,5 @@ module.exports = {
   verifyMedicalCampById,
   softDeleteMedicalCampById,
   hardDeleteMedicalCampById,
+  disableMedicalCampById,
 };
