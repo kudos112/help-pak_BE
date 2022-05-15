@@ -101,7 +101,6 @@ const medicalCampSchema = mongoose.Schema(
       type: String,
       default: 'New',
     },
-
     new: {
       type: Boolean,
       default: true,
