@@ -3,6 +3,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('../plugins');
 const { roles } = require('../config/roles');
+const { statusTypes } = require('../config/model-status');
 
 const ngosSchema = mongoose.Schema(
   {
@@ -20,7 +21,6 @@ const ngosSchema = mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
       lowercase: true,
       validate(value) {
@@ -56,60 +56,50 @@ const ngosSchema = mongoose.Schema(
       required: true,
     },
     followUs: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'FollowUs',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'FollowUs',
+      required: true,
     },
     personPost: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'PersonPosts',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PersonPosts',
+      required: true,
     },
     whoWeAre: {
       type: String,
       required: true,
     },
     whatWeDo: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ProjectsCompleted',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ProjectsCompleted',
+      required: true,
     },
     ourPartners: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'OurPartners',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'OurPartners',
+      required: true,
     },
     background: {
       type: String,
       required: true,
     },
-    // password: {                   //required or not??
-    //   type: String,
-    //   required: true,
-    //   trim: true,
-    //   minlength: 8,
-    //   validate(value) {
-    //     if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-    //       throw new Error('Password must contain at least one letter and one number');
-    //     }
-    //   },
-    //   private: true, // used by the toJSON plugin
-    // },
     role: {
       type: String,
       enum: roles,
       default: 'ngo',
       private: true,
     },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-      private: true,
+    status: {
+      type: string,
+      default: statusTypes.NEW,
+    },
+    new: {
+      type: boolean,
+      default: true,
     },
     enabled: {
       type: Boolean,
       default: false,
-      private: true,
     },
     deleted: {
       type: Boolean,
@@ -137,24 +127,6 @@ ngosSchema.statics.isEmailTaken = async function (email, excludeNgoId) {
   const ngo = await this.findOne({ email, _id: { $ne: excludeNgoId } });
   return !!ngo;
 };
-
-/**
- * Check if password matches the ngo's password
- * @param {string} password
- * @returns {Promise<boolean>}
- */
-ngosSchema.methods.isPasswordMatch = async function (password) {
-  const ngo = this;
-  return bcrypt.compare(password, ngo.password);
-};
-
-ngosSchema.pre('save', async function (next) {
-  const ngo = this;
-  if (ngo.isModified('password')) {
-    ngo.password = await bcrypt.hash(ngo.password, 8);
-  }
-  next();
-});
 
 /**
  * @typedef Ngo

@@ -5,24 +5,24 @@ const Schema = mongoose.Schema;
 
 //Create Schema
 const FollowUsSchema = new Schema(
-    {
-        data: {
-            type: Array,
-            defaults: [],
-        },
-        ngoRegNo: {
-            type: Schema.Types.ObjectId,
-            ref: 'Ngo',
-            required: true,
-          },
-        visible: {
-            type: boolean,
-            defaults: true,
-        },
+  {
+    data: {
+      type: Array,
+      defaults: [],
     },
-    {
-        timestamps: true,
-    }
+    ngoId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Ngo',
+      required: true,
+    },
+    visible: {
+      type: boolean,
+      defaults: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
 );
 
 FollowUsSchema.plugin(toJSON);
