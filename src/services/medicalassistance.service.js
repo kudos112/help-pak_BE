@@ -52,10 +52,15 @@ const getMedicalAssistanceById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<MedicalAssistance>}
  */
-const updateMedicalAssistanceById = async (medicalAssistanceId, updateBody) => {
+const updateMedicalAssistanceById = async (userId, medicalAssistanceId, updateBody) => {
   const medicalAssistance = await getMedicalAssistanceById(medicalAssistanceId);
-  if (!medicalAssistance) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found. No service available by provider');
+  if (
+    !medicalAssistance ||
+    !medicalAssistance.enabled ||
+    medicalAssistance.deleted ||
+    (medicalAssistance && medicalAssistance.provider.toString() != userId.toString())
+  ) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found.');
   }
   if (updateBody.email && (await MedicalAssistance.isEmailTaken(updateBody.email, medicalAssistanceId))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');

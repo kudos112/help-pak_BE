@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
+const deepPopulate = require('mongoose-deep-populate')(mongoose);
 const validator = require('validator');
 const { toJSON, paginate } = require('../plugins');
-const deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 const medicalCampSchema = mongoose.Schema(
   {
@@ -32,7 +32,6 @@ const medicalCampSchema = mongoose.Schema(
       trim: true,
     },
     email: {
-      //camp official email
       type: String,
       required: true,
       trim: true,

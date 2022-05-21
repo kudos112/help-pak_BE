@@ -50,6 +50,11 @@ if (config.env === 'production') {
   app.use('/v1/auth', authLimiter);
 }
 
+// get server route
+app.get('/', (req, res) => {
+  res.send('<h1>Server is burning 🔥</h1>');
+});
+
 // v1 api routes
 app.use('/v1', routes);
 

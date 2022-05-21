@@ -8,7 +8,7 @@ let url = 'http://localhost:3000/account/reset-password';
 if (process.env.NODE_ENV === 'production') url = 'https://help-pak.vercel.app/account/reset-password';
 
 // const transport = nodemailer.createTransport(config.email.smtp);
-var transport = nodemailer.createTransport({
+const transport = nodemailer.createTransport({
   host: config.email.smtp.host,
   port: config.email.smtp.port,
   auth: {

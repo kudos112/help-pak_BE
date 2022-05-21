@@ -1,12 +1,41 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const { toJSON, paginate } = require('./plugins');
+const { toJSON, paginate } = require('../plugins');
+const { statusTypes } = require('../../config/model-status');
 
-const medicalAssistanceSchema = mongoose.Schema(
+const donationItemSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      unique: true,
+      required: true,
+      trim: true,
+    },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    // brand: {
+    //   type: String,
+    //   // required: true,
+    //   default: '',
+    //   trim: true,
+    // },
+    // used: {
+    //   type: String,
+    //   ,
+    //   trim: true,
+    // },
+    condition: {
+      type: String,
+      required: true,
+    },
+    color: {
+      type: String,
+      default: '',
+    },
+    description: {
+      type: String,
       required: true,
       trim: true,
     },
@@ -22,17 +51,6 @@ const medicalAssistanceSchema = mongoose.Schema(
       },
     },
     phoneNo: {
-      type: Number,
-      required: true,
-      unique: false,
-      trim: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-
-    serviceType: {
       type: String,
       required: true,
       trim: true,
@@ -47,40 +65,30 @@ const medicalAssistanceSchema = mongoose.Schema(
       required: true,
       unique: false,
     },
-    location: {
-      type: String, //Location,
-    },
-    startTime: {
-      type: String, //timestamps,
-    },
-    endTime: {
-      type: String, //timestamps,
-    },
-    fullDay: {
-      type: Boolean,
-      required: true,
-    },
-    workingDays: {
-      type: Array,
-      required: true,
-    },
     images: {
       type: Array,
       required: true,
     },
-    provider: {
+    ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
     },
-    providerName: {
+    ownerName: {
       type: String,
       required: true,
+    },
+    new: {
+      type: Boolean,
+      default: true,
+    },
+    status: {
+      type: String,
+      default: statusTypes.NEW,
     },
     enabled: {
       type: Boolean,
       default: false,
-      private: true,
     },
     deleted: {
       type: Boolean,
@@ -94,12 +102,12 @@ const medicalAssistanceSchema = mongoose.Schema(
 );
 
 // add plugin that converts mongoose to json
-medicalAssistanceSchema.plugin(toJSON);
-medicalAssistanceSchema.plugin(paginate);
+donationItemSchema.plugin(toJSON);
+donationItemSchema.plugin(paginate);
 
 /**
- * @typedef MedicalAssistance
+ * @typedef ItemDonation
  */
-const MedicalAssistance = mongoose.model('MedicalAssistance', medicalAssistanceSchema);
+const ItemDonation = mongoose.model('ItemDonation', donationItemSchema);
 
-module.exports = MedicalAssistance;
+module.exports = ItemDonation;
