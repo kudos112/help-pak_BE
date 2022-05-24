@@ -13,8 +13,56 @@ const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
+const http = require('http');
 
 const app = express();
+const socketsServer = http.createServer(app);
+const io = require('socket.io')(socketsServer, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
+});
+
+let users = [];
+
+const addUser = (userId, socketId) => {
+  !users.some((user) => user.userId === userId) && users.push({ userId, socketId });
+};
+
+const removeUser = (sid) => {
+  users = users.filter((user) => user.socketId !== sid);
+};
+
+const getUser = (userId) => {
+  return users.find((user) => user.userId === userId);
+};
+
+io.on('connection', (socket) => {
+  console.log('a new User connected');
+  console.log(users);
+  io.emit('welcome', 'hello to all users');
+  socket.on('addUser', (userId) => {
+    addUser(userId, socket.id);
+    io.emit('getUsers', users);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('a user disconnected');
+    removeUser(socket.id);
+    io.emit('getUsers', users);
+  });
+
+  socket.on('sendMessage', ({ senderId, receiverId, text }) => {
+    const user = getUser(receiverId);
+    console.log('message sent to', senderId);
+    console.log(user);
+    io.to(user.socketId).emit('getMessage', {
+      senderId,
+      text,
+    });
+  });
+});
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
@@ -69,4 +117,4 @@ app.use(errorConverter);
 // handle error
 app.use(errorHandler);
 
-module.exports = app;
+module.exports = { socketsServer };

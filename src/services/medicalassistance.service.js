@@ -62,9 +62,9 @@ const updateMedicalAssistanceById = async (userId, medicalAssistanceId, updateBo
   ) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found.');
   }
-  if (updateBody.email && (await MedicalAssistance.isEmailTaken(updateBody.email, medicalAssistanceId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-  }
+  // if (updateBody.email && (await MedicalAssistance.isEmailTaken(updateBody.email, medicalAssistanceId))) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  // }
   Object.assign(medicalAssistance, updateBody);
   await medicalAssistance.save();
   return medicalAssistance;
