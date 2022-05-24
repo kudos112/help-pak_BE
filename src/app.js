@@ -19,7 +19,7 @@ const app = express();
 const socketsServer = http.createServer(app);
 const io = require('socket.io')(socketsServer, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: config.frontend_url,
     methods: ['GET', 'POST'],
   },
 });
@@ -40,27 +40,30 @@ const getUser = (userId) => {
 
 io.on('connection', (socket) => {
   console.log('a new User connected');
-  console.log(users);
   io.emit('welcome', 'hello to all users');
   socket.on('addUser', (userId) => {
     addUser(userId, socket.id);
     io.emit('getUsers', users);
+    console.log(users);
   });
 
   socket.on('disconnect', () => {
     console.log('a user disconnected');
     removeUser(socket.id);
     io.emit('getUsers', users);
+    console.log(users);
   });
 
   socket.on('sendMessage', ({ senderId, receiverId, text }) => {
     const user = getUser(receiverId);
-    console.log('message sent to', senderId);
-    console.log(user);
-    io.to(user.socketId).emit('getMessage', {
-      senderId,
-      text,
-    });
+    if (user != null) {
+      console.log('message sent to', senderId);
+      console.log(user);
+      io.to(user.socketId).emit('getMessage', {
+        senderId,
+        text,
+      });
+    }
   });
 });
 
