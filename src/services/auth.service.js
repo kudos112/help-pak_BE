@@ -21,22 +21,6 @@ const loginWithEmailAndPassword = async (email, password) => {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Please wait! You'll get an email when you'll be verified");
   }
   return user;
-
-  // else if ( userType === 'NGO' )
-  // {
-  //   const ngo = await ngoService.getNgoWithEmailAndPassword(email, password);
-  //   if (!ngo) {
-  //     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
-  //   }
-  //   if (ngo.enabled === false) {
-  //     throw new ApiError(httpStatus.UNAUTHORIZED, "Please wait! You'll get an email when you'll be verified");
-  //   }
-  //   return ngo;
-  // }
-  // throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
-
-  // else
-  // cons user = await ngoService.getUserByEmail( email );
 };
 
 const adminLoginWithEmailAndPassword = async (email, password) => {

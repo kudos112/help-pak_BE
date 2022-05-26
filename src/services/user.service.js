@@ -12,7 +12,7 @@ const createUser = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   if (userBody.userType === 'NGO') {
-    if (userBody.regNo) userBody = { ...userBody, role: 'ngo' };
+    if (userBody.regNo) userBody = { ...userBody, role: 'user' };
     else throw new ApiError(httpStatus.BAD_REQUEST, 'Ngo Registration number is requried to signup');
   }
   const user = await User.create(userBody);
