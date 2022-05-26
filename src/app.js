@@ -14,58 +14,11 @@ const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const http = require('http');
+const { ChatSockets } = require('./sockets/index');
 
 const app = express();
 const socketsServer = http.createServer(app);
-const io = require('socket.io')(socketsServer, {
-  cors: {
-    origin: config.frontend_url,
-    methods: ['GET', 'POST'],
-  },
-});
-
-let users = [];
-
-const addUser = (userId, socketId) => {
-  !users.some((user) => user.userId === userId) && users.push({ userId, socketId });
-};
-
-const removeUser = (sid) => {
-  users = users.filter((user) => user.socketId !== sid);
-};
-
-const getUser = (userId) => {
-  return users.find((user) => user.userId === userId);
-};
-
-io.on('connection', (socket) => {
-  console.log('a new User connected');
-  io.emit('welcome', 'hello to all users');
-  socket.on('addUser', (userId) => {
-    addUser(userId, socket.id);
-    io.emit('getUsers', users);
-    console.log(users);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('a user disconnected');
-    removeUser(socket.id);
-    io.emit('getUsers', users);
-    console.log(users);
-  });
-
-  socket.on('sendMessage', ({ senderId, receiverId, text }) => {
-    const user = getUser(receiverId);
-    if (user != null) {
-      console.log('message sent to', senderId);
-      console.log(user);
-      io.to(user.socketId).emit('getMessage', {
-        senderId,
-        text,
-      });
-    }
-  });
-});
+ChatSockets(socketsServer);
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);

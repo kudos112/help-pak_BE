@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { chatService } = require('../services');
+const pick = require('../utils/pick');
 
 const startConversation = catchAsync(async (req, res) => {
   const conversation = await chatService.startConversation(req.body);
@@ -17,9 +18,23 @@ const getMessagesByConversationId = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(messages);
 });
 
-const getConversationsByUserId = catchAsync(async (req, res) => {
-  const conversations = await chatService.getConversationsByUserId(req.params.userId);
+const getPaginatedMessagesByConversationId = catchAsync(async (req, res) => {
+  const filter = pick(req.query, ['conversationId', 'deleted']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  console.log(options);
+  const messages = await chatService.getPaginatedMessagesByConversationId(filter, options);
+  res.status(httpStatus.OK).send(messages);
+});
+
+const getConversations = catchAsync(async (req, res) => {
+  const conversations = await chatService.getConversations(req.user);
   res.status(httpStatus.OK).send(conversations);
 });
 
-module.exports = { startConversation, sendMessage, getMessagesByConversationId, getConversationsByUserId };
+module.exports = {
+  startConversation,
+  sendMessage,
+  getMessagesByConversationId,
+  getConversations,
+  getPaginatedMessagesByConversationId,
+};

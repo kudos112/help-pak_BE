@@ -10,12 +10,7 @@ const startConversation = {
 
 const sendMessage = {
   body: Joi.object().keys({
-    sender: Joi.object()
-      .keys({
-        senderName: Joi.string().required(),
-        senderId: Joi.custom(objectId).required(),
-      })
-      .required(),
+    senderId: Joi.string().required().required(),
     text: Joi.string().required(),
     conversationId: Joi.string().required(),
   }),

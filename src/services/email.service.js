@@ -2,6 +2,8 @@ const nodemailer = require('nodemailer');
 const config = require('../config/config');
 const logger = require('../config/logger');
 const catchAsync = require('../utils/catchAsync');
+const { userService } = require('../services');
+const { User } = require('../models');
 
 let url = 'http://localhost:3000/account/reset-password';
 
@@ -177,16 +179,35 @@ const sendMedicalCampVerficationEmail = async (to, medicalCamp) => {
   await sendEmail(to, subject, text);
 };
 
+const sendUnreadMessagesEmail = async (userId) => {
+  const user = await User.findById(userId);
+  if (user?.deleted === true) return;
+  const subject = 'New Messages in HelpPak Messenger';
+  const text = `Dear user,
+                You have recieved 5 messages in your HelpPak Messenger. Go Checkout these reply the users asap.\n\n Thanks.\nHelpPak`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(user.email, subject, text);
+};
+
+const sendContactUsEmail = async (email, name, message) => {
+  const subject = `${name} comments HelpPak`;
+  const text = `Name: ${name}\nEmail: ${email}\nMessage: ${message}`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail('quddoux112@gmail.com', subject, text);
+};
+
 module.exports = {
   transport,
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
   sendUnverifiedAccountEmail,
+  sendContactUsEmail,
   sendAccountRegisterEmail,
   sendAccountVerficationEmail,
   sendCreateMedicalService,
   sendCreateMedicalCamp,
   sendMedicalAssistanceVerficationEmail,
   sendMedicalCampVerficationEmail,
+  sendUnreadMessagesEmail,
 };

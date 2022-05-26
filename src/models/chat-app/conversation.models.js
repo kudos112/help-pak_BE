@@ -4,10 +4,13 @@ const deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 const ConversationSchema = mongoose.Schema(
   {
-    members: {
-      type: [mongoose.Schema.Types.ObjectId],
-      required: true,
-    },
+    members: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User',
+      },
+    ],
     deleted: {
       type: Boolean,
       default: false,
@@ -20,7 +23,7 @@ const ConversationSchema = mongoose.Schema(
 
 ConversationSchema.plugin(toJSON);
 ConversationSchema.plugin(paginate);
-ConversationSchema.plugin(deepPopulate);
+// ConversationSchema.plugin(deepPopulate);
 
 ConversationSchema.statics.usersAlreadyHaveConversation = async function (senderId, recieverId) {
   const conversations = await this.find({

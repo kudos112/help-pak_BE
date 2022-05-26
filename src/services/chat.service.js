@@ -16,7 +16,7 @@ const startConversation = async (requestBody) => {
 
 const sendMessage = async (requestBody) => {
   const message = await Message.create({
-    sender: requestBody.sender,
+    senderId: requestBody.senderId,
     text: requestBody.text,
     conversationId: requestBody.conversationId,
   });
@@ -36,10 +36,15 @@ const getMessagesByConversationId = async (conversationId) => {
   return messages;
 };
 
-const getConversationsByUserId = async (userId) => {
+const getPaginatedMessagesByConversationId = async (filter, options) => {
+  const messages = await Message.paginate(filter, options);
+  return messages;
+};
+
+const getConversations = async (user) => {
   const conversations = await Conversation.find({
-    members: { $in: [userId] },
-  });
+    members: { $in: [user.id] },
+  }).populate('members');
   if (!conversations) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Conversations not found');
   }
@@ -48,7 +53,8 @@ const getConversationsByUserId = async (userId) => {
 
 module.exports = {
   startConversation,
+  getPaginatedMessagesByConversationId,
   sendMessage,
   getMessagesByConversationId,
-  getConversationsByUserId,
+  getConversations,
 };

@@ -5,17 +5,9 @@ const deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 const MessageSchema = mongoose.Schema(
   {
-    sender: {
-      type: {
-        senderName: {
-          type: String,
-          required: true,
-        },
-        senderId: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: true,
-        },
-      },
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
     text: {
@@ -29,7 +21,6 @@ const MessageSchema = mongoose.Schema(
     },
     deleted: {
       type: Boolean,
-
       default: false,
     },
   },

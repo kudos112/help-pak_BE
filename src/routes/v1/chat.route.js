@@ -13,10 +13,6 @@ router.get(
   chatController.getMessagesByConversationId
 );
 
-router.get(
-  '/get-conversations/:userId',
-  [auth(), validate(chatValidation.getConversationsByUserId)],
-  chatController.getConversationsByUserId
-);
+router.get('/get-conversations', auth(), chatController.getConversations);
 
 module.exports = router;

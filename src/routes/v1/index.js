@@ -7,6 +7,7 @@ const medicalCampRoute = require('./medicalcamp.route');
 const donationItemRoute = require('./donationItem.route');
 const chatRoute = require('./chat.route');
 const docsRoute = require('./docs.route');
+const emailRoute = require('./email.route');
 const config = require('../../config/config');
 
 const router = express.Router();
@@ -39,6 +40,10 @@ const defaultRoutes = [
   {
     path: '/chat',
     route: chatRoute,
+  },
+  {
+    path: '/email',
+    route: emailRoute,
   },
 ];
 
