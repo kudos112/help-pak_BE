@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get(
   '/user/:userId',
-  validate(donationItemValidation.getitemDonationByUserId),
+  validate(donationItemValidation.getDonationItemByUserId),
   donationItemController.getDonationItemByUserId
 );
 
