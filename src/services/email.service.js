@@ -2,7 +2,6 @@ const nodemailer = require('nodemailer');
 const config = require('../config/config');
 const logger = require('../config/logger');
 const catchAsync = require('../utils/catchAsync');
-const { userService } = require('../services');
 const { User } = require('../models');
 
 let url = 'http://localhost:3000/account/reset-password';
@@ -79,6 +78,22 @@ const sendCreateMedicalCamp = async (to) => {
   // replace this url with the link to the reset password page of your front-end app
   const text = `Dear user,
                 First of all kudos to you because you've done great by providing free medical camp services.
+                Admin is going to verify your credentials until unless you can
+                explore the website or can give us a short review.\n
+                You'll get an verification Email when your given details will be verified and on the table.\n\n Thanks.\n Admin HelpPak`;
+  await sendEmail(to, subject, text);
+};
+
+/**
+ * Send medical service creation email
+ * @param {string} to
+ * @returns {Promise}
+ */
+const sendCreateDonationItem = async (to) => {
+  const subject = 'Donation Item Created';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                First of all kudos to you because you've done great by providing Your item for donation.
                 Admin is going to verify your credentials until unless you can
                 explore the website or can give us a short review.\n
                 You'll get an verification Email when your given details will be verified and on the table.\n\n Thanks.\n Admin HelpPak`;
@@ -167,7 +182,25 @@ const sendMedicalAssistanceVerficationEmail = async (to, medicalAssistance) => {
   await sendEmail(to, subject, text);
 };
 
-const sendMedicalCampVerficationEmail = async (to, medicalCamp) => {
+/**
+ * Send medical Assistance verification email
+ * @param {string} to
+ * @returns {Promise}
+ */
+
+const sendItemDonationVerficationEmail = async (to, donationItem) => {
+  const subject = 'Donation Item Verified';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                Your Donation Item with title "${donationItem.name}" has been Verfied.\n\n
+                Now every needy user is able to see and contact to you.
+                You're appealed to help needy person who might contact you or reach you by our context thanks in advance.
+                Admin and team will always be there for you for any inconvenience you have.\n\n
+                Plus Admin is going to verify everything you'll create here.\n\n Thanks.\nHelpPak`;
+  await sendEmail(to, subject, text);
+};
+
+const sendMedicalCampVerficationEmail = async (medicalCamp) => {
   const subject = 'Medical Camp Verified';
   // replace this url with the link to the reset password page of your front-end app
   const text = `Dear user,
@@ -176,7 +209,7 @@ const sendMedicalCampVerficationEmail = async (to, medicalCamp) => {
                 You're appealed to help all of them who might contact you or reach you by our context thanks in advance.
                 Admin and team will always be there for you for any inconvenience you have.\n\n
                 Plus Admin is going to verify everything you'll create here.\n\n Thanks.\nHelpPak`;
-  await sendEmail(to, subject, text);
+  await sendEmail(medicalCamp.email, subject, text);
 };
 
 const sendUnreadMessagesEmail = async (userId) => {
@@ -196,6 +229,51 @@ const sendContactUsEmail = async (email, name, message) => {
   await sendEmail('quddoux112@gmail.com', subject, text);
 };
 
+const sendDonationItemDeletedEmail = async (donationItem) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${donationItem.name} seems to be ambigous. So
+   Admin has decided to delete your item instead of listing with ambigous data. I hope you'll come next time with real details.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(donationItem.email, subject, text);
+};
+
+const sendMedicalCampDeletedEmail = async (medicalCamp) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${medicalCamp.name} seems to be ambigous. So
+   Admin has decided to delete your item instead of listing with ambigous data. I hope you'll come next time with real details.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(medicalCamp.email, subject, text);
+};
+
+const sendDisabledDonationItemEmail = async (donationItem) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${donationItem.name} seems to be ambigous. So
+   Admin has decided to disable your item instead of listing with ambigous data. I hope you'll come next time with real details.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(donationItem.email, subject, text);
+};
+
+const sendDisabledMedicalAssistanceEmail = async (medicalAssistance) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${medicalAssistance.name} seems to be ambigous. So
+   Admin has decided to disable your item instead of listing with ambigous data. I hope you'll come next time with real details.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(medicalAssistance.email, subject, text);
+};
+
+const sendMedicalCampDisableEmail = async (medicalCamp) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${medicalCamp.name} seems to be ambigous. So
+   Admin has decided to disable your item instead of listing with ambigous data. I hope you'll come next time with real details.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(medicalCamp.email, subject, text);
+};
+
 module.exports = {
   transport,
   sendEmail,
@@ -205,9 +283,16 @@ module.exports = {
   sendContactUsEmail,
   sendAccountRegisterEmail,
   sendAccountVerficationEmail,
+  sendCreateDonationItem,
   sendCreateMedicalService,
+  sendItemDonationVerficationEmail,
   sendCreateMedicalCamp,
   sendMedicalAssistanceVerficationEmail,
   sendMedicalCampVerficationEmail,
+  sendMedicalCampDisableEmail,
   sendUnreadMessagesEmail,
+  sendMedicalCampDeletedEmail,
+  sendDonationItemDeletedEmail,
+  sendDisabledDonationItemEmail,
+  sendDisabledMedicalAssistanceEmail,
 };

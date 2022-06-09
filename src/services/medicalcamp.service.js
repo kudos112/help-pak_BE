@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const mongoose = require('mongoose');
+const { statusTypes } = require('../config/model-status');
 const Doctors = require('../models/medical-camp/doctors.model');
 const MedicalCamp = require('../models/medical-camp/medicalcamp.model');
 const ApiError = require('../utils/ApiError');
@@ -143,7 +144,7 @@ const verifyMedicalCampById = async (campId) => {
   }
   medicalCamp.enabled = true;
   medicalCamp.new = false;
-  medicalCamp.status = 'Live';
+  medicalCamp.status = statusTypes.LIVE;
   await medicalCamp.save();
   return medicalCamp;
 };
@@ -160,7 +161,7 @@ const disableMedicalCampById = async (campId) => {
   }
   medicalCamp.enabled = false;
   medicalCamp.new = false;
-  medicalCamp.status = 'Disabled';
+  medicalCamp.status = statusTypes.DISABLED;
   await medicalCamp.save();
   return medicalCamp;
 };
@@ -178,7 +179,7 @@ const softDeleteMedicalCampById = async (campId) => {
   medicalCamp.deleted = true;
   medicalCamp.new = false;
   medicalCamp.enabled = false;
-  medicalCamp.status = 'Deleted';
+  medicalCamp.status = statusTypes.DELETED;
   await medicalCamp.save();
 };
 

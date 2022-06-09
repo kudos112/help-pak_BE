@@ -7,7 +7,7 @@ const { donationItemService, emailService } = require('../services');
 
 const createDonationItem = catchAsync(async (req, res) => {
   await donationItemService.createDonationItem(req.user, req.body);
-  // await emailService.sendCreateDonationItem(req.body.email);
+  await emailService.sendCreateDonationItem(req.body.email);
   res.status(httpStatus.CREATED).send({
     message: 'Successfull',
     description: "Please wait! You'll get an email when your provided details will be verified by admin",
@@ -22,7 +22,6 @@ const getDonationItems = catchAsync(async (req, res) => {
 });
 
 const getDonationItemByUserId = catchAsync(async (req, res) => {
-  // const _filter = pick(req.query, ['name', 'serviceType', 'city', 'enabled', 'deleted']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
 
   const result = await donationItemService.queryDonationItems(
@@ -49,19 +48,19 @@ const updateDonationItem = catchAsync(async (req, res) => {
 
 const verifyDonationItem = catchAsync(async (req, res) => {
   const donationItem = await donationItemService.verifyDonationItemById(req.params.itemId);
-  //   await emailService.sendItemDonationVerficationEmail(itemDonation.email, itemDonation);
+  await emailService.sendItemDonationVerficationEmail(donationItem.email, donationItem);
   res.send(donationItem);
 });
 
 const softDeleteDonationItem = catchAsync(async (req, res) => {
-  const donationItem = await donationItemService.softDeleteDonationItemById(req.params.itemId);
-  if (req.user.role === 'admin') emailService.sendUnverifiedAccountEmail(donationItem.email);
+  const donationItem = await donationItemService.softDeleteDonationItemById(req.params.itemId, req.user);
+  if (req.user.role === 'admin') emailService.sendDonationItemDeletedEmail(donationItem);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 const disableDonationItem = catchAsync(async (req, res) => {
   const donationItem = await donationItemService.disableDonationItemById(req.params.itemId);
-  // await emailService.sendAccountVerficationEmail(donationItem.email);
+  await emailService.sendDisabledDonationItemEmail(donationItem);
   res.send(donationItem);
 });
 

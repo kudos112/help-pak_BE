@@ -22,7 +22,6 @@ const getMedicalCamps = catchAsync(async (req, res) => {
 });
 
 const getMedicalCampByOrganizerId = catchAsync(async (req, res) => {
-  // const _filter = pick(req.query, ['name', 'serviceType', 'city', 'enabled', 'deleted']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
 
   const result = await medicalCampService.queryMedicalCamps(
@@ -49,18 +48,19 @@ const updateMedicalCamp = catchAsync(async (req, res) => {
 
 const verifyMedicalCamp = catchAsync(async (req, res) => {
   const medicalCamp = await medicalCampService.verifyMedicalCampById(req.params.campId);
-  await emailService.sendAccountVerficationEmail(medicalCamp.email);
+  await emailService.sendMedicalCampVerficationEmail(medicalCamp);
   res.send(medicalCamp);
 });
 
 const disableMedicalCamp = catchAsync(async (req, res) => {
   const medicalCamp = await medicalCampService.disableMedicalCampById(req.params.campId);
-  await emailService.sendAccountVerficationEmail(medicalCamp.email);
+  await emailService.sendMedicalCampDisableEmail(medicalCamp);
   res.send(medicalCamp);
 });
 
 const softDeleteMedicalCamp = catchAsync(async (req, res) => {
   await medicalCampService.softDeleteMedicalCampById(req.params.campId);
+  await emailService.sendMedicalCampDeletedEmail(medicalCamp.email);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

@@ -15,7 +15,7 @@ const createMedicalAssistance = catchAsync(async (req, res) => {
 });
 
 const getMedicalAssistances = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'serviceType', 'city', 'enabled', 'deleted']);
+  const filter = pick(req.query, ['name', 'serviceType', 'city', 'new', 'enabled', 'deleted']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await medicalAssistanceService.queryMedicalAssitances(filter, options);
   res.send(result);
@@ -57,8 +57,17 @@ const verifyMedicalAssistance = catchAsync(async (req, res) => {
   res.send(medicalAssistance);
 });
 
+const disableMedicalAssistance = catchAsync(async (req, res) => {
+  const medicalAssistance = await medicalAssistanceService.disableMedicalAssistanceById(req.params.AssistanceId);
+  await emailService.sendDisabledMedicalAssistanceEmail(medicalAssistance);
+  res.send(medicalAssistance);
+});
+
 const softdeleteMedicalAssistance = catchAsync(async (req, res) => {
-  const medicalAssistance = await medicalAssistanceService.softDeleteMedicalAssistanceById(req.params.medicalAssistanceId);
+  const medicalAssistance = await medicalAssistanceService.softDeleteMedicalAssistanceById(
+    req.params.medicalAssistanceId,
+    req.user
+  );
   if (req.user.role === 'admin') emailService.sendUnverifiedAccountEmail(medicalAssistance.email);
   res.status(httpStatus.NO_CONTENT).send();
 });
@@ -76,5 +85,6 @@ module.exports = {
   updateMedicalAssistance,
   softdeleteMedicalAssistance,
   hardDeleteMedicalAssistance,
+  disableMedicalAssistance,
   verifyMedicalAssistance,
 };

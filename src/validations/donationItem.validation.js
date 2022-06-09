@@ -50,6 +50,7 @@ const updateDonationItem = {
       // used: Joi.string().optional(),
       condition: Joi.number().optional(),
       color: Joi.string().optional().allow(''),
+      name: Joi.string().required(),
       email: Joi.string().optional().email(),
       phoneNo: Joi.string().optional(),
       fullAddress: Joi.string().optional(),

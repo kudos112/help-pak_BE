@@ -29,6 +29,7 @@ const getMedicalAssistances = {
     page: Joi.number().integer().allow('').allow(null),
     enabled: Joi.boolean(),
     deleted: Joi.boolean(),
+    new: Joi.boolean().allow(null),
   }),
 };
 
@@ -66,6 +67,11 @@ const deleteMedicalAssistance = {
     medicalAssistanceId: Joi.string().custom(objectId),
   }),
 };
+const disableMedicalAssistance = {
+  params: Joi.object().keys({
+    medicalAssistanceId: Joi.string().custom(objectId),
+  }),
+};
 
 const verifyMedicalAssistance = {
   params: Joi.object().keys({
@@ -87,4 +93,5 @@ module.exports = {
   deleteMedicalAssistance,
   verifyMedicalAssistance,
   getMedicalAssistanceByUserId,
+  disableMedicalAssistance,
 };

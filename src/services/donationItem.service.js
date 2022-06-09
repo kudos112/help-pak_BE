@@ -83,11 +83,16 @@ const getDonationItemsByUserId = async (id) => {
  * @param {ObjectId} itemId
  * @returns {Promise<DonationItem>}
  */
-const softDeleteDonationItemById = async (itemId) => {
+const softDeleteDonationItemById = async (itemId, user) => {
   const donationItem = await getDonationItemById(itemId);
   if (!donationItem) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Item not found');
   }
+
+  if (user.role !== 'admin')
+    if (donationItem.ownerId.toString() !== user.id.toString())
+      throw new ApiError(httpStatus.NOT_FOUND, 'You are not authorized for this request');
+
   donationItem.deleted = true;
   donationItem.new = false;
   donationItem.status = statusTypes.DELETED;

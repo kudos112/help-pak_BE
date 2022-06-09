@@ -42,6 +42,13 @@ router.post(
   medicalAssistanceController.verifyMedicalAssistance
 );
 
+router.post(
+  '/disable/:medicalAssistanceId',
+  auth('manageUsers'),
+  validate(medicalAssistanceValidation.disableMedicalAssistance),
+  medicalAssistanceController.disableMedicalAssistance
+);
+
 router.delete(
   '/hard-delete/:medicalAssistanceId',
   auth('manageUsers'),

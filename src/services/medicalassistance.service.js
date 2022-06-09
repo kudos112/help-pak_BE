@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
+const { statusTypes } = require('../config/model-status');
 const { MedicalAssistance } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { sendEmail } = require('./email.service');
 
 /**
  * Create a medical assistance services
@@ -85,14 +85,39 @@ const getMedicalAssistancesByUserId = async (id) => {
  * @param {ObjectId} medicalAssistanceId
  * @returns {Promise<MedicalAssistance>}
  */
-const softDeleteMedicalAssistanceById = async (medicalAssistanceId) => {
+const softDeleteMedicalAssistanceById = async (medicalAssistanceId, user) => {
   const medicalAssistance = await getMedicalAssistanceById(medicalAssistanceId);
-  if (!medicalAssistance) {
+  if (!medicalAssistance || !medicalAssistance.enabled) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found');
   }
+
+  if (user.role !== 'admin')
+    if (medicalAssistance.provider.toString() !== user.id.toString())
+      throw new ApiError(httpStatus.NOT_FOUND, 'You are not authorized for this request');
+
   medicalAssistance.deleted = true;
+  medicalAssistance.enabled = false;
+  medicalAssistance.new = false;
+  medicalAssistance.status = statusTypes.DELETED;
   await medicalAssistance.save();
   return medicalAssistance;
+};
+
+/**
+ * disable medical Assistanc by id
+ * @param {ObjectId} AssistanceId
+ * @returns {Promise<MedicalAssistanc>}
+ */
+const disableMedicalAssistanceById = async (assistancId) => {
+  const medicalAssistanc = await getMedicalAssistancById(assistancId);
+  if (!medicalAssistanc) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found');
+  }
+  medicalAssistanc.enabled = false;
+  medicalAssistanc.new = false;
+  medicalAssistanc.status = statusTypes.DISABLED;
+  await medicalAssistanc.save();
+  return medicalAssistanc;
 };
 
 /**
@@ -124,6 +149,8 @@ const verifyMedicalAssistanceById = async (medicalAssistanceId) => {
   if (!medicalAssistance) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found');
   }
+  medicalAssistance.new = false;
+  medicalAssistance.status = statusTypes.LIVE;
   medicalAssistance.enabled = true;
   await medicalAssistance.save();
   return medicalAssistance;
@@ -134,6 +161,7 @@ module.exports = {
   queryMedicalAssitances,
   getMedicalAssistanceById,
   updateMedicalAssistanceById,
+  disableMedicalAssistanceById,
   softDeleteMedicalAssistanceById,
   hardDeleteMedicalAssistanceById,
   verifyMedicalAssistanceById,

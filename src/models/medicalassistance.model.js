@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const { statusTypes } = require('../config/model-status');
 const { toJSON, paginate } = require('./plugins');
 
 const medicalAssistanceSchema = mongoose.Schema(
@@ -80,12 +81,23 @@ const medicalAssistanceSchema = mongoose.Schema(
     enabled: {
       type: Boolean,
       default: false,
-      private: true,
     },
     deleted: {
       type: Boolean,
       default: false,
       private: true,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    new: {
+      type: Boolean,
+      default: true,
+    },
+    status: {
+      type: String,
+      default: statusTypes.NEW,
     },
   },
   {
