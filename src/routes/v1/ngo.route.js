@@ -8,13 +8,13 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(auth('manageNgos'), validate(ngoValidation.createNgo), ngoController.createNgo)
-  .get(auth('getNgos'), validate(ngoValidation.getNgos), ngoController.getNgos);
+  .post(auth(), validate(ngoValidation.createNgo), ngoController.createNgo)
+  .get(validate(ngoValidation.getNgos), ngoController.getNgos);
 
 router
   .route('/:ngoId')
-  .get(auth(), validate(ngoValidation.getNgo), ngoController.getNgo)
-  .patch(auth('manageNgos'), validate(ngoValidation.updateNgo), ngoController.updateNgo)
+  .get(validate(ngoValidation.getNgo), ngoController.getNgo)
+  .patch(auth(), validate(ngoValidation.updateNgo), ngoController.updateNgo)
   .delete(auth(), validate(ngoValidation.deleteNgo), ngoController.softDeleteNgo);
 
 router.post('/verify/:ngoId', auth('manageUsers'), validate(ngoValidation.verifyNgo), ngoController.verifyNgo);

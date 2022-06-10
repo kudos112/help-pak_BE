@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const { ngoService, emailService } = require('../services');
 
 const createNgo = catchAsync(async (req, res) => {
-  const ngo = await ngoService.createNgo(req.body);
+  const ngo = await ngoService.createNgo(req.body, req.user);
   res.status(httpStatus.CREATED).send(ngo);
 });
 

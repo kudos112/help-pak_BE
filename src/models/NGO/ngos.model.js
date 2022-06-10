@@ -1,18 +1,10 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('../plugins');
-const { roles } = require('../config/roles');
 const { statusTypes } = require('../config/model-status');
 
 const ngosSchema = mongoose.Schema(
   {
-    userType: {
-      type: String,
-      required: true,
-      enum: ['NGO'],
-      trim: true,
-    },
     name: {
       type: String,
       required: true,
@@ -29,7 +21,7 @@ const ngosSchema = mongoose.Schema(
         }
       },
     },
-    ngoRegNo: {
+    regNo: {
       type: String,
       required: true,
       trim: true,
@@ -40,54 +32,53 @@ const ngosSchema = mongoose.Schema(
     },
     vision: {
       type: String,
-      required: true,
+      default: '',
     },
-    ouMission: {
+    ourMission: {
       type: String,
-      required: true,
+      default: '',
     },
-    quickLinks: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'QuickLinks',
-      required: true,
+    whoWeAre: {
+      type: String,
+      default: '',
+    },
+    background: {
+      type: String,
+      default: '',
     },
     images: {
       type: Array,
       required: true,
     },
-    followUs: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'FollowUs',
-      required: true,
-    },
     personPost: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'PersonPosts',
-      required: true,
+      // required: true,
+      default: null,
     },
-    whoWeAre: {
-      type: String,
-      required: true,
-    },
-    whatWeDo: {
+    whatWeDid: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'ProjectsCompleted',
-      required: true,
+      // required: true,
+      default: null,
     },
     ourPartners: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'OurPartners',
-      required: true,
+      // required: true,
+      defualt: null,
     },
-    background: {
-      type: String,
-      required: true,
+    quickLinks: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'QuickLinks',
+      // required: true,
+      default: null,
     },
-    role: {
-      type: String,
-      enum: roles,
-      default: 'ngo',
-      private: true,
+    followUs: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'FollowUs',
+      // required: true,
+      default: null,
     },
     status: {
       type: string,
@@ -117,14 +108,26 @@ ngosSchema.plugin(toJSON);
 ngosSchema.plugin(paginate);
 
 /**
- * Check if email is taken
- * @param {string} email - The NGO's email
+ * Check if name is taken
+ * @param {string} name - The NGO's name
  * @param {ObjectId} [excludeNgoId] - The id of the NGO to be excluded
  * @returns {Promise<boolean>}
  */
-ngosSchema.statics.isEmailTaken = async function (email, excludeNgoId) {
+ngosSchema.statics.isNameTaken = async function (name, excludeNgoId) {
   //NGO ID need to be created.....
-  const ngo = await this.findOne({ email, _id: { $ne: excludeNgoId } });
+  const ngo = await this.findOne({ name, _id: { $ne: excludeNgoId } });
+  return !!ngo;
+};
+
+/**
+ * Check if regNo is taken
+ * @param {string} regNo - The NGO's regNo
+ * @param {ObjectId} [excludeNgoId] - The id of the NGO to be excluded
+ * @returns {Promise<boolean>}
+ */
+ngosSchema.statics.isRegNoTaken = async function (regNo, excludeNgoId) {
+  //NGO ID need to be created.....
+  const ngo = await this.findOne({ regNo, _id: { $ne: excludeNgoId } });
   return !!ngo;
 };
 

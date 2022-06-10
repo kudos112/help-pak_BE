@@ -8,11 +8,27 @@ const { sendEmail } = require('./email.service');
  * @param {Object} ngoBody
  * @returns {Promise<Ngo>}
  */
-const createNgo = async (ngoBody) => {
-  if ((await User.isEmailTaken(ngoBody.email)) || (await Ngo.isEmailTaken(ngoBody.email))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-  }
-  const ngo = await Ngo.create(ngoBody);
+const createNgo = async (ngoBody, user) => {
+  if (user.role !== 'ngo') throw new ApiError(httpStatus.FORBIDDEN, 'To publish your NGO, you have to sign up as a NGO');
+  if (Ngo.isNameTaken(ngoBody.name)) throw new ApiError(httpStatus.BAD_REQUEST, 'A NGO already registered with this name');
+  if (Ngo.isRegNoTaken(ngoBody.regNo))
+    throw new ApiError(httpStatus.BAD_REQUEST, 'A NGO already registered with this Registration Number');
+
+  let newNgo = {
+    name: ngoBody.name,
+    email: ngoBody.email,
+    regNo: ngoBody.regNo,
+    description: ngoBody.description,
+    images: ngoBody.images,
+    vision: ngoBody?.vision || '',
+    ourMission: ngoBody.ourMission || '',
+    whoWeAre: ngoBody.whoWeAre || '',
+    background: ngoBody.background || '',
+  };
+
+  const ngo = await Ngo.create(newNgo);
+
+  if (!ngo) throw new ApiError(httpStatus.BAD_REQUEST, 'NGO not created');
 
   return ngo;
 };
