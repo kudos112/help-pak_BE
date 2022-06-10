@@ -4,6 +4,7 @@ const userRoute = require('./user.route');
 const ngoRoute = require('./ngo.route');
 const medicalAssistanceRoute = require('./medicalassistance.route');
 const medicalCampRoute = require('./medicalcamp.route');
+const fundraisingRoute = require('./fundraising.route');
 const donationItemRoute = require('./donationItem.route');
 const chatRoute = require('./chat.route');
 const docsRoute = require('./docs.route');
@@ -32,6 +33,10 @@ const defaultRoutes = [
   {
     path: '/medical-camp',
     route: medicalCampRoute,
+  },
+  {
+    path: '/fundraising',
+    route: fundraisingRoute,
   },
   {
     path: '/donation-item',

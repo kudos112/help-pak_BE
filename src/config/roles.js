@@ -2,7 +2,7 @@ const allRoles = {
   user: [],
   ngo: [],
   provider: [],
-  admin: ['getUsers', 'manageUsers', 'manageNgos', 'getNgos', 'manageMedicalCamps'],
+  admin: ['getUsers', 'manageUsers', 'manageNgos', 'getNgos', 'manageFundraisings', 'manageMedicalCamps'],
 };
 
 const roles = Object.keys(allRoles);
