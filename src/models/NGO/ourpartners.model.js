@@ -16,7 +16,7 @@ const OurPartnersSchema = new Schema(
       required: true,
     },
     visible: {
-      type: boolean,
+      type: Boolean,
       defaults: true,
     },
   },

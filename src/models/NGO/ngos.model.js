@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
+//const bcrypt = require('bcryptjs');
+const deepPopulate = require('mongoose-deep-populate')(mongoose);
 const { toJSON, paginate } = require('../plugins');
-const { roles } = require('../config/roles');
-const { statusTypes } = require('../config/model-status');
+const { roles } = require('../../config/roles');
+const { statusTypes } = require('../../config/model-status');
 
 const ngosSchema = mongoose.Schema(
   {
@@ -34,6 +35,10 @@ const ngosSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    ngoAuthenticationCertificationImage: {
+      type: Array,
+      required: true,
+    },
     description: {
       type: String,
       required: true,
@@ -42,28 +47,32 @@ const ngosSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    ouMission: {
+    ourMission: {
       type: String,
       required: true,
     },
-    quickLinks: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'QuickLinks',
+    background: {
+      type: String,
       required: true,
     },
     images: {
       type: Array,
       required: true,
     },
+    quickLinks: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'QuickLinks',
+      default: null,
+    },
     followUs: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'FollowUs',
-      required: true,
+      default: null,
     },
-    personPost: {
+    personsPost: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'PersonPosts',
-      required: true,
+      ref: 'PersonsPosts',
+      default: null,
     },
     whoWeAre: {
       type: String,
@@ -72,16 +81,31 @@ const ngosSchema = mongoose.Schema(
     whatWeDo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'ProjectsCompleted',
-      required: true,
+      default: null,
     },
     ourPartners: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'OurPartners',
-      required: true,
+      default: null,
     },
-    background: {
+    ownerName: {
       type: String,
+      trim: true,
+    },
+    ownerEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
+    },
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: 'User',
     },
     role: {
       type: String,
@@ -90,11 +114,11 @@ const ngosSchema = mongoose.Schema(
       private: true,
     },
     status: {
-      type: string,
+      type: String,
       default: statusTypes.NEW,
     },
     new: {
-      type: boolean,
+      type: Boolean,
       default: true,
     },
     enabled: {
@@ -115,6 +139,7 @@ const ngosSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 ngosSchema.plugin(toJSON);
 ngosSchema.plugin(paginate);
+ngosSchema.plugin(deepPopulate);
 
 /**
  * Check if email is taken

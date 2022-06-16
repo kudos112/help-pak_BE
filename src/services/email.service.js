@@ -85,6 +85,22 @@ const sendCreateMedicalCamp = async (to) => {
 };
 
 /**
+ * Send ngo service creation email
+ * @param {string} to
+ * @returns {Promise}
+ */
+ const sendCreateNgo = async (to) => {
+  const subject = 'NGO Created';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                First of all kudos to you because you've done great by providing free NGO page services.
+                Admin is going to verify your credentials until unless you can
+                explore the website or can give us a short review.\n
+                You'll get an verification Email when your given details will be verified and on the table.\n\n Thanks.\n Admin HelpPak`;
+  await sendEmail(to, subject, text);
+};
+
+/**
  * Send medical service creation email
  * @param {string} to
  * @returns {Promise}
@@ -247,6 +263,15 @@ const sendMedicalCampDeletedEmail = async (medicalCamp) => {
   await sendEmail(medicalCamp.email, subject, text);
 };
 
+const sendNgoDeletedEmail = async (ngo) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${ngo.name} seems to be ambigous. So
+   Admin has decided to delete your item instead of listing with ambigous data. I hope you'll come next time with real details.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(ngo.email, subject, text);
+};
+
 const sendDisabledDonationItemEmail = async (donationItem) => {
   const subject = `HelpPak Support`;
   const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${donationItem.name} seems to be ambigous. So
@@ -274,6 +299,15 @@ const sendMedicalCampDisableEmail = async (medicalCamp) => {
   await sendEmail(medicalCamp.email, subject, text);
 };
 
+const sendNgoDisableEmail = async (ngo) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${ngo.name} seems to be ambigous. So
+   Admin has decided to disable your item instead of listing with ambigous data. I hope you'll come next time with real details.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(ngo.email, subject, text);
+};
+
 module.exports = {
   transport,
   sendEmail,
@@ -285,13 +319,16 @@ module.exports = {
   sendAccountVerficationEmail,
   sendCreateDonationItem,
   sendCreateMedicalService,
+  sendCreateNgo,
   sendItemDonationVerficationEmail,
   sendCreateMedicalCamp,
   sendMedicalAssistanceVerficationEmail,
   sendMedicalCampVerficationEmail,
   sendMedicalCampDisableEmail,
+  sendNgoDisableEmail,
   sendUnreadMessagesEmail,
   sendMedicalCampDeletedEmail,
+  sendNgoDeletedEmail,
   sendDonationItemDeletedEmail,
   sendDisabledDonationItemEmail,
   sendDisabledMedicalAssistanceEmail,

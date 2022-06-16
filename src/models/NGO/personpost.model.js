@@ -4,7 +4,7 @@ const { toJSON, paginate } = require('../plugins');
 const Schema = mongoose.Schema;
 
 //Create Schema
-const PersonPostSchema = new Schema(
+const PersonsPostSchema = new Schema(
   {
     data: {
       type: Array,
@@ -16,7 +16,7 @@ const PersonPostSchema = new Schema(
       required: true,
     },
     visible: {
-      type: boolean,
+      type: Boolean,
       defaults: true,
     },
   },
@@ -25,7 +25,7 @@ const PersonPostSchema = new Schema(
   }
 );
 
-PersonPostSchema.plugin(toJSON);
-PersonPostSchema.plugin(paginate);
+PersonsPostSchema.plugin(toJSON);
+PersonsPostSchema.plugin(paginate);
 
-module.exports = PersonPost = mongoose.model('PersonPost', PersonPostSchema);
+module.exports = PersonsPost = mongoose.model('PersonsPost', PersonsPostSchema);
