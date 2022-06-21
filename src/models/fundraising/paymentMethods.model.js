@@ -6,13 +6,20 @@ const Schema = mongoose.Schema;
 //Create Schema
 const PaymentMethodsSchema = new Schema(
   {
-    data: {
-      type: Array,
-      default: [],
+    bankName: {
+      type: String,
+      required: true,
+    },
+    accountNo: {
+      type: String,
+      required: true,
+    },
+    accountName: {
+      type: String,
+      required: true,
     },
     fundraisingId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Fundraising',
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
     visible: {

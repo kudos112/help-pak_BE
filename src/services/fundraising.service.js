@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const PaymentMethods = require('../models/fundraising/paymentMethods.model');
 const Fundraising = require('../models/fundraising/fundraising.model');
 const ApiError = require('../utils/ApiError');
-const { sendEmail } = require('./email.service');
+const { statusTypes } = require('../config/model-status');
 
 /**
  * Create a fundraising services
@@ -11,13 +11,23 @@ const { sendEmail } = require('./email.service');
  * @returns {Promise<Fundraising>}
  */
 const createFundraising = async (user, fundraisingBody) => {
-  if (await Fundraising.isNameTaken(fundraisingBody.name)) throw new ApiError(httpStatus.BAD_REQUEST, 'name already taken');
+  if (await Fundraising.isNameTaken(fundraisingBody.name))
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Fundraising Title already taken, try another ');
 
   const fundraisingId = new mongoose.Types.ObjectId();
-  const paymentMethods = await PaymentMethods.create({
-    data: fundraisingBody.paymentMethods,
-    fundraisingId,
-  });
+
+  let paymentMethods = fundraisingBody.paymentMethods;
+
+  let pmIds = [];
+
+  for (let i = 0; i < paymentMethods.length; i++) {
+    const paymentMethod = await PaymentMethods.create({
+      ...paymentMethods[i],
+      fundraisingId,
+    });
+    if (!paymentMethod) return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error occured! Try again');
+    pmIds.push(paymentMethod.id);
+  }
 
   let newFundraisingBody = { ...fundraisingBody };
 
@@ -25,11 +35,11 @@ const createFundraising = async (user, fundraisingBody) => {
 
   const fundraising = await Fundraising.create({
     _id: fundraisingId,
-    paymentMethods: paymentMethods._id,
+    paymentMethods: pmIds,
     noOfPaymentMethods: fundraisingBody.paymentMethods.length,
-    organizerId: user.id,
-    organizerName: user.name,
-    organizerEmail: user.email,
+    fundraiserId: user.id,
+    fundraiserName: user.name,
+    fundraiserEmail: user.email,
     ...newFundraisingBody,
   });
   return fundraising;
@@ -51,6 +61,9 @@ const queryFundraisings = async (filter, options) => {
       name: new RegExp(`${filter.name}`, 'i'),
     };
   }
+
+  filter.deleted = false;
+
   const fundraisings = await Fundraising.paginate(filter, options);
   return fundraisings;
 };
@@ -71,8 +84,8 @@ const getFundraisingById = async (id) => {
  * @param {ObjectId} id
  * @returns {Promise<Fundraising>}
  */
-const getProviderFundraisingById = async (organizerId) => {
-  const fundraising = await Fundraising.findById(organizerId).deepPopulate(`paymentMethods`).exec();
+const getProviderFundraisingById = async (fundraiserId) => {
+  const fundraising = await Fundraising.findById(fundraiserId).deepPopulate(`paymentMethods`).exec();
   if (!fundraising) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Fundraising not found');
   }
@@ -92,34 +105,34 @@ const updateFundraisingById = async (fundraisingId, updateBody, userId) => {
     !fundraising ||
     !fundraising.enabled ||
     fundraising.deleted ||
-    (fundraising && fundraising.organizerId.toString() != userId.toString())
+    (fundraising && fundraising.fundraiserId.toString() != userId.toString())
   ) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No fundraising found against this id');
   }
 
   if (updateBody.name && (await Fundraising.isNameTaken(updateBody.name, fundraisingId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'name already taken');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Fundraising Title already taken, try another');
   }
 
-  let newFundraisingBody = { ...updateBody };
-  const paymentMethods = await PaymentMethods.findOne({
-    fundraisingId,
-  }).exec();
-  if (updateBody.paymentMethods) {
-    paymentMethods.data = updateBody.paymentMethods;
-    await paymentMethods.save();
+  // let newFundraisingBody = { ...updateBody };
+  // const paymentMethods = await PaymentMethods.findOne({
+  //   fundraisingId,
+  // }).exec();
+  // if (updateBody.paymentMethods) {
+  //   paymentMethods.data = updateBody.paymentMethods;
+  //   await paymentMethods.save();
 
-    newFundraisingBody = { ...newFundraisingBody, noOfPaymentMethods: paymentMethods.data.length };
-  }
+  //   newFundraisingBody = { ...newFundraisingBody, noOfPaymentMethods: paymentMethods.data.length };
+  // }
 
-  delete newFundraisingBody['paymentMethods'];
+  // delete newFundraisingBody['paymentMethods'];
 
-  const newFundraising = {
-    paymentMethods: paymentMethods._id,
-    ...newFundraisingBody,
-  };
+  // const newFundraising = {
+  //   paymentMethods: paymentMethods._id,
+  //   ...newFundraisingBody,
+  // };
 
-  Object.assign(fundraising, newFundraising);
+  Object.assign(fundraising, updateBody);
   await fundraising.save();
   const updated = await getFundraisingById(fundraisingId);
   return updated;
@@ -137,7 +150,7 @@ const verifyFundraisingById = async (fundraisingId) => {
   }
   fundraising.enabled = true;
   fundraising.new = false;
-  fundraising.status = 'Live';
+  fundraising.status = statusTypes.LIVE;
   await fundraising.save();
   return fundraising;
 };
@@ -154,7 +167,7 @@ const disableFundraisingById = async (fundraisingId) => {
   }
   fundraising.enabled = false;
   fundraising.new = false;
-  fundraising.status = 'Disabled';
+  fundraising.status = statusTypes.DISABLED;
   await fundraising.save();
   return fundraising;
 };
@@ -172,7 +185,7 @@ const softDeleteFundraisingById = async (fundraisingId) => {
   fundraising.deleted = true;
   fundraising.new = false;
   fundraising.enabled = false;
-  fundraising.status = 'Deleted';
+  fundraising.status = statusTypes.DELETED;
   await fundraising.save();
 };
 

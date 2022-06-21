@@ -4,21 +4,22 @@ const { password, objectId } = require('./custom.validation');
 const createFundraising = {
   body: Joi.object().keys({
     name: Joi.string().required(),
-    reasonForFundraising: Joi.string().required(),
+    reason: Joi.string().required(),
+    amount: Joi.number().greater(1).required(),
     description: Joi.string().required(),
     email: Joi.string().required().email(),
     city: Joi.string().required(),
     fullAddress: Joi.string().required(),
     phoneNo: Joi.number().integer().required(),
-    paymentMethods: Joi.array().min(0).required(),
+    paymentMethods: Joi.array().min(1).required(),
     images: Joi.array().required(),
   }),
 };
 
 const getFundraisings = {
   query: Joi.object().keys({
-    organizerName: Joi.string(),
-    organizerId: Joi.number().integer(),
+    fundraiserName: Joi.string(),
+    fundraiserId: Joi.number().integer(),
     role: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
@@ -26,9 +27,9 @@ const getFundraisings = {
     enabled: Joi.boolean(),
     deleted: Joi.boolean(),
     new: Joi.boolean(),
-    city: Joi.string().allow(""),
-    reasonForFundraising: Joi.string().allow(""),
-    name: Joi.string().allow(""),
+    city: Joi.string().allow(''),
+    reason: Joi.string().allow(''),
+    name: Joi.string().allow(''),
   }),
 };
 
@@ -63,6 +64,8 @@ const updateFundraising = {
   body: Joi.object()
     .keys({
       email: Joi.string().optional().email(),
+      amount: Joi.string().optional(),
+      reason: Joi.string().optional(),
       city: Joi.string().optional(),
       fullAddress: Joi.string().optional(),
       organizerName: Joi.string().optional(),

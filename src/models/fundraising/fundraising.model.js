@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const deepPopulate = require('mongoose-deep-populate')(mongoose);
 const validator = require('validator');
+const { statusTypes } = require('../../config/model-status');
 const { toJSON, paginate } = require('../plugins');
 
 const fundraisingSchema = mongoose.Schema(
@@ -11,7 +12,11 @@ const fundraisingSchema = mongoose.Schema(
       unique: true,
       trim: true,
     },
-    reasonForFundraising: {
+    amount: {
+      type: Number,
+      required: true,
+    },
+    reason: {
       type: String,
       required: true,
       trim: true,
@@ -43,45 +48,47 @@ const fundraisingSchema = mongoose.Schema(
       },
     },
     phoneNo: {
-      type: Number,
+      type: String,
       required: true,
-      trim: true,
+      // trim: true,
     },
     images: {
       type: Array,
-      required: true,
+      default: [],
     },
     noOfPaymentMethods: {
       type: Number,
       default: 0,
     },
-    paymentMethods: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'PaymentMethods',
-      default: null,
-    },
-    organizerName: {
-        type: String,
-        trim: true,
-      },
-    organizerEmail: {
-        type: String,
-        trim: true,
-        lowercase: true,
-        validate(value) {
-          if (!validator.isEmail(value)) {
-            throw new Error('Invalid email');
-          }
-        },
-      },
-    organizerId: {
+    paymentMethods: [
+      {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'PaymentMethods',
         required: true,
-        ref: 'User',
       },
+    ],
+    fundraiserName: {
+      type: String,
+      trim: true,
+    },
+    fundraiserEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
+    },
+    fundraiserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
     status: {
       type: String,
-      default: 'New',
+      default: statusTypes.NEW,
     },
     new: {
       type: Boolean,
@@ -113,7 +120,7 @@ fundraisingSchema.plugin(deepPopulate);
  * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
  * @returns {Promise<boolean>}
  */
- fundraisingSchema.statics.isNameTaken = async function (name, excludeUserId) {
+fundraisingSchema.statics.isNameTaken = async function (name, excludeUserId) {
   const fundraising = await this.findOne({ name, _id: { $ne: excludeUserId } });
   return !!fundraising;
 };

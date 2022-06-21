@@ -15,7 +15,7 @@ const createFundraising = catchAsync(async (req, res) => {
 });
 
 const getFundraisings = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'requestForFundraising', 'enabled', 'deleted', 'new', 'city']);
+  const filter = pick(req.query, ['name', 'reason', 'bankName', 'enabled', 'deleted', 'new', 'city']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await fundraisingService.queryFundraisings(filter, options);
   res.send(result);

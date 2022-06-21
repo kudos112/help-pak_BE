@@ -17,13 +17,13 @@ router
   .patch([auth(), validate(fundraisingValidation.updateFundraising)], fundraisingController.updateFundraising)
   .delete([auth(), validate(fundraisingValidation.deleteFundraising)], fundraisingController.softDeleteFundraising);
 
-router.post(
+router.patch(
   '/verify/:fundraisingId',
   auth('manageFundraisings'),
   validate(fundraisingValidation.verifyFundraising),
   fundraisingController.verifyFundraising
 );
-router.post(
+router.patch(
   '/disable/:fundraisingId',
   auth('manageFundraisings'),
   validate(fundraisingValidation.disableFundraising),
