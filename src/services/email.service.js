@@ -85,6 +85,22 @@ const sendCreateMedicalCamp = async (to) => {
 };
 
 /**
+ * Send fundraising service creation email
+ * @param {string} to
+ * @returns {Promise}
+ */
+ const sendCreateFundraising = async (to) => {
+  const subject = 'Fundraising Created';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                First of all kudos to you because you've done great by providing free medical camp services.
+                Admin is going to verify your credentials until unless you can
+                explore the website or can give us a short review.\n
+                You'll get an verification Email when your given details will be verified and on the table.\n\n Thanks.\n Admin HelpPak`;
+  await sendEmail(to, subject, text);
+};
+
+/**
  * Send medical service creation email
  * @param {string} to
  * @returns {Promise}
@@ -285,6 +301,7 @@ module.exports = {
   sendAccountVerficationEmail,
   sendCreateDonationItem,
   sendCreateMedicalService,
+  sendCreateFundraising,
   sendItemDonationVerficationEmail,
   sendCreateMedicalCamp,
   sendMedicalAssistanceVerficationEmail,

@@ -5,5 +5,6 @@ module.exports.userService = require('./user.service');
 module.exports.ngoService = require('./ngo.service');
 module.exports.medicalAssistanceService = require('./medicalassistance.service');
 module.exports.medicalCampService = require('./medicalcamp.service');
+module.exports.fundraisingService = require('./fundraising.service');
 module.exports.donationItemService = require('./donationItem.service');
 module.exports.chatService = require('./chat.service');
