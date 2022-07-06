@@ -6,7 +6,7 @@ const createNgo = {
     name: Joi.string().required(),
     city: Joi.string().required(),
     fullAddress: Joi.string().required(),
-    regNo: Joi.number().required(),
+    regNo: Joi.string().required(),
     email: Joi.string().required().email(),
     phoneNo: Joi.string().required(),
     vision: Joi.string().required(),
