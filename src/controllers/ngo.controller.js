@@ -6,11 +6,15 @@ const { ngoService, emailService } = require('../services');
 
 const createNgo = catchAsync(async (req, res) => {
   const ngo = await ngoService.createNgo(req.body, req.user);
-  res.status(httpStatus.CREATED).send(ngo);
+  // await emailService.sendCreateMedicalService(req.body.email);
+  res.status(httpStatus.CREATED).send({
+    message: 'Successfull',
+    description: "Please wait! You'll get an email when your provided details will be verified by admin",
+  });
 });
 
 const getNgos = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'role', 'enabled', 'deleted']);
+  const filter = pick(req.query, ['name', 'city', 'role', 'published', 'deleted', 'new']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await ngoService.queryNgos(filter, options);
   res.send(result);
@@ -26,6 +30,12 @@ const getNgo = catchAsync(async (req, res) => {
 
 const verifyNgo = catchAsync(async (req, res) => {
   const ngo = await ngoService.verifyNgoById(req.params.ngoId, req.body);
+  await emailService.sendVerificationEmail(ngo.email);
+  res.send(ngo);
+});
+
+const disableNgo = catchAsync(async (req, res) => {
+  const ngo = await ngoService.disableNgoById(req.params.ngoId, req.body);
   await emailService.sendVerificationEmail(ngo.email);
   res.send(ngo);
 });
@@ -52,4 +62,5 @@ module.exports = {
   softDeleteNgo,
   hardDeleteNgo,
   verifyNgo,
+  disableNgo,
 };

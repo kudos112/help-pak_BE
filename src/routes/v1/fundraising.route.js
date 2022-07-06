@@ -9,7 +9,7 @@ const router = express.Router();
 router.route('/').post([auth(), validate(fundraisingValidation.createFundraising)], fundraisingController.createFundraising);
 router.get('/', validate(fundraisingValidation.getFundraisings), fundraisingController.getFundraisings);
 
-router.route('/getfundraisings/:organizerId').get(fundraisingController.getFundraisingByOrganizerId);
+router.route('/user/:id').get(fundraisingController.getFundraisingByFundraiserId);
 
 router
   .route('/:fundraisingId')

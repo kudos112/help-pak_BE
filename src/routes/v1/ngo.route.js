@@ -8,7 +8,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(auth(), validate(ngoValidation.createNgo), ngoController.createNgo)
+  .post([auth(), validate(ngoValidation.createNgo)], ngoController.createNgo)
   .get(validate(ngoValidation.getNgos), ngoController.getNgos);
 
 router
@@ -17,7 +17,8 @@ router
   .patch(auth(), validate(ngoValidation.updateNgo), ngoController.updateNgo)
   .delete(auth(), validate(ngoValidation.deleteNgo), ngoController.softDeleteNgo);
 
-router.post('/verify/:ngoId', auth('manageUsers'), validate(ngoValidation.verifyNgo), ngoController.verifyNgo);
+router.patch('/verify/:ngoId', auth('manageUsers'), validate(ngoValidation.verifyNgo), ngoController.verifyNgo);
+router.patch('/disable/:ngoId', auth('manageUsers'), validate(ngoValidation.verifyNgo), ngoController.disableNgo);
 router.delete('/hard-delete/:ngoId', auth('manageNgos'), validate(ngoValidation.deleteNgo), ngoController.hardDeleteNgo);
 
 module.exports = router;

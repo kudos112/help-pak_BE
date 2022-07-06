@@ -105,15 +105,15 @@ const sendCreateMedicalCamp = async (to) => {
  * @param {string} to
  * @returns {Promise}
  */
-const sendCreateDonationItem = async (to) => {
-  const subject = 'Donation Item Created';
+const sendCreateDonationItem = async (donationItem) => {
+  const subject = `Donation Item ${donationItem.name} Created`;
   // replace this url with the link to the reset password page of your front-end app
   const text = `Dear user,
                 First of all kudos to you because you've done great by providing Your item for donation.
                 Admin is going to verify your credentials until unless you can
                 explore the website or can give us a short review.\n
                 You'll get an verification Email when your given details will be verified and on the table.\n\n Thanks.\n Admin HelpPak`;
-  await sendEmail(to, subject, text);
+  await sendEmail(donationItem.email, subject, text);
 };
 
 /**
@@ -216,6 +216,38 @@ const sendItemDonationVerficationEmail = async (to, donationItem) => {
   await sendEmail(to, subject, text);
 };
 
+const sendFundraisingVerficationEmail = async (fundraising) => {
+  const subject = 'Fundraising Request Verified';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                Your Fundraising Request with title "${fundraising.name}" has been Verfied.\n\n
+                Now any donor can contact you.
+                You're appealed to abstain from the junk and irrelevant Fundraising otherwise your account will be banned.\n\n
+                Plus Admin is going to verify everything you'll create here.\n\n Thanks.\nHelpPak`;
+  await sendEmail(fundraising.email, subject, text);
+};
+
+const sendFundraisingDisabledEmail = async (fundraising) => {
+  const subject = 'Fundraising Disabled';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                Your Fundraising Request with title "${fundraising.name}" has been Disabled.\n
+                You're appealed to abstain from the junk and irrelevant Fundraising otherwise your account will be banned.\n
+                Plus Admin is going to verify everything you'll create here.\n Thanks.\nHelpPak`;
+  await sendEmail(fundraising.email, subject, text);
+};
+
+const sendFundraisingDeleteEmail = async (fundraising) => {
+  const subject = 'Fundraising Deleted';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                Your Fundraising Request with title "${fundraising.name}" has been deleted.\n
+                
+                You're appealed to abstain from the junk and irrelevant Fundraising otherwise your account will be banned.\n
+                Plus Admin is going to verify everything you'll create here.\n Thanks.\nHelpPak`;
+  await sendEmail(fundraising.email, subject, text);
+};
+
 const sendMedicalCampVerficationEmail = async (medicalCamp) => {
   const subject = 'Medical Camp Verified';
   // replace this url with the link to the reset password page of your front-end app
@@ -312,4 +344,7 @@ module.exports = {
   sendDonationItemDeletedEmail,
   sendDisabledDonationItemEmail,
   sendDisabledMedicalAssistanceEmail,
+  sendFundraisingVerficationEmail,
+  sendFundraisingDisabledEmail,
+  sendFundraisingDeleteEmail,
 };

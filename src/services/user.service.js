@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { User, Ngo } = require('../models');
+const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -8,7 +8,7 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<User>}
  */
 const createUser = async (userBody) => {
-  if ((await User.isEmailTaken(userBody.email)) || (await Ngo.isEmailTaken(userBody.email))) {
+  if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   if (userBody.userType === 'NGO') {

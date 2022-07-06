@@ -21,16 +21,8 @@ const getFundraisings = catchAsync(async (req, res) => {
   res.send(result);
 });
 
-const getFundraisingByOrganizerId = catchAsync(async (req, res) => {
-  // const _filter = pick(req.query, ['name', 'serviceType', 'city', 'enabled', 'deleted']);
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-
-  const result = await fundraisingService.queryFundraisings(
-    {
-      $and: [{ organizerId: mongoose.Types.ObjectId(req.params.organizerId) }, { deleted: false }, { enabled: true }],
-    },
-    options
-  );
+const getFundraisingByFundraiserId = catchAsync(async (req, res) => {
+  const result = await fundraisingService.getFundraisingByFundraiserId(req.params.id);
   res.send(result);
 });
 
@@ -49,18 +41,19 @@ const updateFundraising = catchAsync(async (req, res) => {
 
 const verifyFundraising = catchAsync(async (req, res) => {
   const fundraising = await fundraisingService.verifyFundraisingById(req.params.fundraisingId);
-  await emailService.sendAccountVerficationEmail(fundraising.email);
+  await emailService.sendFundraisingVerficationEmail(fundraising);
   res.send(fundraising);
 });
 
 const disableFundraising = catchAsync(async (req, res) => {
   const fundraising = await fundraisingService.disableFundraisingById(req.params.fundraisingId);
-  await emailService.sendAccountVerficationEmail(fundraising.email);
+  await emailService.sendFundraisingDisabledEmail(fundraising);
   res.send(fundraising);
 });
 
 const softDeleteFundraising = catchAsync(async (req, res) => {
   await fundraisingService.softDeleteFundraisingById(req.params.fundraisingId);
+  await emailService.sendFundraisingDeleteEmail(fundraising);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -72,7 +65,7 @@ const hardDeleteFundraising = catchAsync(async (req, res) => {
 module.exports = {
   createFundraising,
   getFundraisings,
-  getFundraisingByOrganizerId,
+  getFundraisingByFundraiserId,
   getFundraising,
   updateFundraising,
   verifyFundraising,

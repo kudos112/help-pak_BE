@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('../plugins');
-const { statusTypes } = require('../config/model-status');
+const { statusTypes } = require('../../config/model-status');
 
 const ngosSchema = mongoose.Schema(
   {
@@ -21,74 +21,78 @@ const ngosSchema = mongoose.Schema(
         }
       },
     },
+    phoneNo: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    fullAddress: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     regNo: {
       type: String,
       required: true,
       trim: true,
     },
-    description: {
-      type: String,
-      required: true,
-    },
     vision: {
       type: String,
       default: '',
-    },
-    ourMission: {
-      type: String,
-      default: '',
-    },
-    whoWeAre: {
-      type: String,
-      default: '',
+      required: true,
     },
     background: {
       type: String,
+      required: true,
       default: '',
     },
     images: {
       type: Array,
       required: true,
     },
-    personPost: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'PersonPosts',
-      // required: true,
-      default: null,
+    founder: {
+      type: {
+        name: {
+          type: String,
+          required: true,
+        },
+        picture: {
+          type: String,
+          required: true,
+        },
+        message: {
+          type: String,
+          default: null,
+        },
+      },
+      required: true,
     },
-    whatWeDid: {
+    paymentMethods: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PaymentMethodsNgo',
+        required: true,
+      },
+    ],
+    creater: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'ProjectsCompleted',
-      // required: true,
-      default: null,
-    },
-    ourPartners: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'OurPartners',
-      // required: true,
-      defualt: null,
-    },
-    quickLinks: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'QuickLinks',
-      // required: true,
-      default: null,
-    },
-    followUs: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'FollowUs',
-      // required: true,
-      default: null,
+      ref: 'User',
+      required: true,
     },
     status: {
-      type: string,
+      type: String,
+      enum: Object.values(statusTypes),
       default: statusTypes.NEW,
     },
     new: {
-      type: boolean,
+      type: Boolean,
       default: true,
     },
-    enabled: {
+    published: {
       type: Boolean,
       default: false,
     },
@@ -115,7 +119,7 @@ ngosSchema.plugin(paginate);
  */
 ngosSchema.statics.isNameTaken = async function (name, excludeNgoId) {
   //NGO ID need to be created.....
-  const ngo = await this.findOne({ name, _id: { $ne: excludeNgoId } });
+  const ngo = await this.findOne({ name, _id: { $ne: excludeNgoId }, deleted: false });
   return !!ngo;
 };
 
@@ -127,7 +131,7 @@ ngosSchema.statics.isNameTaken = async function (name, excludeNgoId) {
  */
 ngosSchema.statics.isRegNoTaken = async function (regNo, excludeNgoId) {
   //NGO ID need to be created.....
-  const ngo = await this.findOne({ regNo, _id: { $ne: excludeNgoId } });
+  const ngo = await this.findOne({ regNo, _id: { $ne: excludeNgoId }, deleted: false });
   return !!ngo;
 };
 

@@ -7,7 +7,7 @@ const { donationItemService, emailService } = require('../services');
 
 const createDonationItem = catchAsync(async (req, res) => {
   await donationItemService.createDonationItem(req.user, req.body);
-  await emailService.sendCreateDonationItem(req.body.email);
+  await emailService.sendCreateDonationItem(req.body);
   res.status(httpStatus.CREATED).send({
     message: 'Successfull',
     description: "Please wait! You'll get an email when your provided details will be verified by admin",
@@ -17,7 +17,7 @@ const createDonationItem = catchAsync(async (req, res) => {
 const getDonationItems = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name', 'category', 'condition', 'city', 'enabled', 'deleted', 'new']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await donationItemService.queryDonationItems(filter, options);
+  const result = await donationItemService.queryDonationItems(filter, options, req.user);
   res.send(result);
 });
 

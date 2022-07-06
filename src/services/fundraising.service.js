@@ -84,8 +84,11 @@ const getFundraisingById = async (id) => {
  * @param {ObjectId} id
  * @returns {Promise<Fundraising>}
  */
-const getProviderFundraisingById = async (fundraiserId) => {
-  const fundraising = await Fundraising.findById(fundraiserId).deepPopulate(`paymentMethods`).exec();
+const getFundraisingByFundraiserId = async (fundraiserId) => {
+  console.log(fundraiserId);
+  const fundraising = await Fundraising.find({ fundraiserId, enabled: true, deleted: false })
+    .deepPopulate(`paymentMethods`)
+    .exec();
   if (!fundraising) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Fundraising not found');
   }
@@ -207,7 +210,7 @@ module.exports = {
   createFundraising,
   queryFundraisings,
   getFundraisingById,
-  getProviderFundraisingById,
+  getFundraisingByFundraiserId,
   updateFundraisingById,
   verifyFundraisingById,
   softDeleteFundraisingById,

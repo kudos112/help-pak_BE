@@ -1,7 +1,9 @@
+const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const { User, Ngo } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { sendEmail } = require('./email.service');
+const PaymentMethods = require('../models/ngo/paymentMethods.model');
+const { statusTypes } = require('../config/model-status');
 
 /**
  * Create a ngo
@@ -9,21 +11,40 @@ const { sendEmail } = require('./email.service');
  * @returns {Promise<Ngo>}
  */
 const createNgo = async (ngoBody, user) => {
-  if (user.role !== 'ngo') throw new ApiError(httpStatus.FORBIDDEN, 'To publish your NGO, you have to sign up as a NGO');
-  if (Ngo.isNameTaken(ngoBody.name)) throw new ApiError(httpStatus.BAD_REQUEST, 'A NGO already registered with this name');
-  if (Ngo.isRegNoTaken(ngoBody.regNo))
+  if (user.userType !== 'NGO' || user.regNo == null) throw new ApiError(httpStatus.FORBIDDEN, 'You are not authorized!');
+  if (await Ngo.isNameTaken(ngoBody.name))
+    throw new ApiError(httpStatus.BAD_REQUEST, 'A NGO already registered with this name');
+  if (await Ngo.isRegNoTaken(ngoBody.regNo))
     throw new ApiError(httpStatus.BAD_REQUEST, 'A NGO already registered with this Registration Number');
 
+  const ngoId = new mongoose.Types.ObjectId();
+
+  let paymentMethods = ngoBody.paymentMethods;
+  let pmIds = [];
+
+  for (let i = 0; i < paymentMethods.length; i++) {
+    const paymentMethod = await PaymentMethods.create({
+      ...paymentMethods[i],
+      ngoId,
+    });
+    if (!paymentMethod) return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error occured! Try again');
+    pmIds.push(paymentMethod.id);
+  }
+
   let newNgo = {
+    _id: ngoId,
     name: ngoBody.name,
+    city: ngoBody.city,
+    fullAddress: ngoBody.fullAddress,
     email: ngoBody.email,
-    regNo: ngoBody.regNo,
-    description: ngoBody.description,
-    images: ngoBody.images,
+    phoneNo: ngoBody.phoneNo,
+    regNo: user.regNo,
     vision: ngoBody?.vision || '',
-    ourMission: ngoBody.ourMission || '',
-    whoWeAre: ngoBody.whoWeAre || '',
     background: ngoBody.background || '',
+    images: ngoBody.images,
+    founder: ngoBody.founder,
+    creater: user.id,
+    paymentMethods: pmIds,
   };
 
   const ngo = await Ngo.create(newNgo);
@@ -43,6 +64,14 @@ const createNgo = async (ngoBody, user) => {
  * @returns {Promise<QueryResult>}
  */
 const queryNgos = async (filter, options) => {
+  if (filter.name) {
+    filter = {
+      ...filter,
+      name: new RegExp(`${filter.name}`, 'i'),
+    };
+  }
+
+  filter.deleted = false;
   const ngos = await Ngo.paginate(filter, options);
   return ngos;
 };
@@ -53,7 +82,7 @@ const queryNgos = async (filter, options) => {
  * @returns {Promise<Ngo>}
  */
 const getNgoById = async (id) => {
-  const ngo = await Ngo.findById(id);
+  const ngo = await Ngo.findById(id).populate('paymentMethods creater');
   if (ngo?.deleted === true) return null;
   return ngo;
 };
@@ -84,9 +113,17 @@ const updateNgoById = async (ngoId, updateBody) => {
   if (!ngo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Ngo not found');
   }
-  if (updateBody.email && (await Ngo.isEmailTaken(updateBody.email, ngoId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-  }
+  // if (updateBody?.paymentMethods?.length > 0) {
+  //   for (let i = 0; i < paymentMethods.length; i++) {
+  //     const paymentMethod = await PaymentMethods.create({
+  //       ...paymentMethods[i],
+  //       ngoId,
+  //     });
+  //     if (!paymentMethod) return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error occured! Try again');
+  //     pmIds.push(paymentMethod.id);
+  //   }
+  // }
+
   Object.assign(ngo, updateBody);
   await ngo.save();
   return ngo;
@@ -129,7 +166,26 @@ const verifyNgoById = async (ngoId) => {
   if (!ngo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Ngo not found');
   }
-  ngo.enabled = true;
+  ngo.published = true;
+  ngo.new = false;
+  ngo.status = statusTypes.LIVE;
+  await ngo.save();
+  return ngo;
+};
+
+/**
+ * verify ngo by id
+ * @param {ObjectId} ngoId
+ * @returns {Promise<User>}
+ */
+const disableNgoById = async (ngoId) => {
+  const ngo = await getNgoById(ngoId);
+  if (!ngo) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Ngo not found');
+  }
+  ngo.published = false;
+  ngo.new = false;
+  ngo.status = statusTypes.DISABLED;
   await ngo.save();
   return ngo;
 };
@@ -144,4 +200,5 @@ module.exports = {
   softDeleteNgoById,
   hardDeleteNgoById,
   verifyNgoById,
+  disableNgoById,
 };
