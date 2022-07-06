@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('../plugins');
 const { statusTypes } = require('../../config/model-status');
+const deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 const ngosSchema = mongoose.Schema(
   {
@@ -110,6 +111,7 @@ const ngosSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 ngosSchema.plugin(toJSON);
 ngosSchema.plugin(paginate);
+ngosSchema.plugin(deepPopulate);
 
 /**
  * Check if name is taken

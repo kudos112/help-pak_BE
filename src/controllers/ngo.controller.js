@@ -20,6 +20,11 @@ const getNgos = catchAsync(async (req, res) => {
   res.send(result);
 });
 
+const getUsersNgos = catchAsync(async (req, res) => {
+  const result = await ngoService.getUsersNgos(req.user.id);
+  res.send(result);
+});
+
 const getNgo = catchAsync(async (req, res) => {
   const ngo = await ngoService.getNgoById(req.params.ngoId);
   if (!ngo) {
@@ -63,4 +68,5 @@ module.exports = {
   hardDeleteNgo,
   verifyNgo,
   disableNgo,
+  getUsersNgos,
 };

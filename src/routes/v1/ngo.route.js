@@ -11,6 +11,8 @@ router
   .post([auth(), validate(ngoValidation.createNgo)], ngoController.createNgo)
   .get(validate(ngoValidation.getNgos), ngoController.getNgos);
 
+router.get('/user', auth(), ngoController.getUsersNgos);
+
 router
   .route('/:ngoId')
   .get(validate(ngoValidation.getNgo), ngoController.getNgo)

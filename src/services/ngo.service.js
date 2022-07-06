@@ -4,6 +4,7 @@ const { User, Ngo } = require('../models');
 const ApiError = require('../utils/ApiError');
 const PaymentMethods = require('../models/ngos/paymentMethods.model');
 const { statusTypes } = require('../config/model-status');
+const { getNgos } = require('../validations/ngo.validation');
 
 /**
  * Create a ngo
@@ -190,6 +191,14 @@ const disableNgoById = async (ngoId) => {
   return ngo;
 };
 
+const getUsersNgos = async (creater) => {
+  const ngos = await Ngo.find({ creater, deleted: false, published: true }).deepPopulate(`paymentMethods`).exec();
+  if (!ngos) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'NGO not found');
+  }
+  return ngos;
+};
+
 module.exports = {
   createNgo,
   queryNgos,
@@ -199,6 +208,7 @@ module.exports = {
   updateNgoById,
   softDeleteNgoById,
   hardDeleteNgoById,
+  getUsersNgos,
   verifyNgoById,
   disableNgoById,
 };
