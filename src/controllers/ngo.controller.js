@@ -6,7 +6,7 @@ const { ngoService, emailService } = require('../services');
 
 const createNgo = catchAsync(async (req, res) => {
   const ngo = await ngoService.createNgo(req.body, req.user);
-  // await emailService.sendCreateMedicalService(req.body.email);
+  await emailService.sendCreateNgo(req.body.email);
   res.status(httpStatus.CREATED).send({
     message: 'Successfull',
     description: "Please wait! You'll get an email when your provided details will be verified by admin",
@@ -35,13 +35,13 @@ const getNgo = catchAsync(async (req, res) => {
 
 const verifyNgo = catchAsync(async (req, res) => {
   const ngo = await ngoService.verifyNgoById(req.params.ngoId, req.body);
-  await emailService.sendVerificationEmail(ngo.email);
+  await emailService.sendNgoVerficationEmail(ngo);
   res.send(ngo);
 });
 
 const disableNgo = catchAsync(async (req, res) => {
   const ngo = await ngoService.disableNgoById(req.params.ngoId, req.body);
-  await emailService.sendVerificationEmail(ngo.email);
+  await emailService.sendNgoDisableEmail(ngo);
   res.send(ngo);
 });
 
@@ -52,6 +52,7 @@ const updateNgo = catchAsync(async (req, res) => {
 
 const softDeleteNgo = catchAsync(async (req, res) => {
   await ngoService.softDeleteNgoById(req.params.ngoId);
+  await emailService.sendNgoDeleteEmail(ngo.email);
   res.status(httpStatus.NO_CONTENT).send();
 });
 const hardDeleteNgo = catchAsync(async (req, res) => {

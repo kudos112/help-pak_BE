@@ -85,6 +85,22 @@ const sendCreateMedicalCamp = async (to) => {
 };
 
 /**
+ * Send ngo creation email
+ * @param {string} to
+ * @returns {Promise}
+ */
+ const sendCreateNgo = async (to) => {
+  const subject = 'Ngo Created';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                First of all kudos to you because you've done great by providing NGOs free platform services.
+                Admin is going to verify your credentials until unless you can
+                explore the website or can give us a short review.\n
+                You'll get an verification Email when your given details will be verified and on the table.\n\n Thanks.\n Admin HelpPak`;
+  await sendEmail(to, subject, text);
+};
+
+/**
  * Send fundraising service creation email
  * @param {string} to
  * @returns {Promise}
@@ -260,6 +276,18 @@ const sendMedicalCampVerficationEmail = async (medicalCamp) => {
   await sendEmail(medicalCamp.email, subject, text);
 };
 
+const sendNgoVerficationEmail = async (ngo) => {
+  const subject = 'Medical Camp Verified';
+  // replace this url with the link to the reset password page of your front-end app
+  const text = `Dear user,
+                Your ngo with title "${ngo.name}" has been Verfied.\n\n
+                Now every needy user is able to see and contact to you.
+                You're appealed to help all of them who might contact you or reach you by our context thanks in advance.
+                Admin and team will always be there for you for any inconvenience you have.\n\n
+                Plus Admin is going to verify everything you'll create here.\n\n Thanks.\nHelpPak`;
+  await sendEmail(ngo.email, subject, text);
+};
+
 const sendUnreadMessagesEmail = async (userId) => {
   const user = await User.findById(userId);
   if (user?.deleted === true) return;
@@ -295,6 +323,14 @@ const sendMedicalCampDeletedEmail = async (medicalCamp) => {
   await sendEmail(medicalCamp.email, subject, text);
 };
 
+const sendNgoDeleteEmail = async (ngo) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${ngo.name} seems to be ambigous. So
+   Admin has decided to delete your ngo. I hope you'll come next time with real details.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(ngo.email, subject, text);
+};
 const sendDisabledDonationItemEmail = async (donationItem) => {
   const subject = `HelpPak Support`;
   const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${donationItem.name} seems to be ambigous. So
@@ -322,6 +358,15 @@ const sendMedicalCampDisableEmail = async (medicalCamp) => {
   await sendEmail(medicalCamp.email, subject, text);
 };
 
+const sendNgoDisableEmail = async (ngo) => {
+  const subject = `HelpPak Support`;
+  const text = `Assalam o Alaikum!\n\nHoped to your wellness, But the details you have provided for the ${ngo.name} seems to be ambigous. So
+   Admin has decided to disable your ngo. I hope you'll come next time with authentic details of ngo.
+   \n\nHope to see you again. Stay Safe.\n\nHelp Pakistan\nAdmin`;
+  // console.log('EMail is going to send', user.email);
+  await sendEmail(ngo.email, subject, text);
+};
+
 module.exports = {
   transport,
   sendEmail,
@@ -334,6 +379,10 @@ module.exports = {
   sendCreateDonationItem,
   sendCreateMedicalService,
   sendCreateFundraising,
+  sendCreateNgo,
+  sendNgoVerficationEmail,
+  sendNgoDisableEmail,
+  sendNgoDeleteEmail,
   sendItemDonationVerficationEmail,
   sendCreateMedicalCamp,
   sendMedicalAssistanceVerficationEmail,
