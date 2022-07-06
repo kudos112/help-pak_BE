@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const { User, Ngo } = require('../models');
 const ApiError = require('../utils/ApiError');
-const PaymentMethods = require('../models/ngo/paymentMethods.model');
+const PaymentMethods = require('../models/ngos/paymentMethods.model');
 const { statusTypes } = require('../config/model-status');
 
 /**
