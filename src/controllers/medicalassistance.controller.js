@@ -58,7 +58,7 @@ const verifyMedicalAssistance = catchAsync(async (req, res) => {
 });
 
 const disableMedicalAssistance = catchAsync(async (req, res) => {
-  const medicalAssistance = await medicalAssistanceService.disableMedicalAssistanceById(req.params.AssistanceId);
+  const medicalAssistance = await medicalAssistanceService.disableMedicalAssistanceById(req.params.medicalAssistanceId);
   await emailService.sendDisabledMedicalAssistanceEmail(medicalAssistance);
   res.send(medicalAssistance);
 });

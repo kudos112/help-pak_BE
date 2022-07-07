@@ -109,7 +109,7 @@ const softDeleteMedicalAssistanceById = async (medicalAssistanceId, user) => {
  * @returns {Promise<MedicalAssistanc>}
  */
 const disableMedicalAssistanceById = async (assistancId) => {
-  const medicalAssistanc = await getMedicalAssistancById(assistancId);
+  const medicalAssistanc = await getMedicalAssistanceById(assistancId);
   if (!medicalAssistanc) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Medical Assistance not found');
   }
